@@ -1,17 +1,23 @@
+import { typeManifest as tm } from 'did-core';
 import { EthrDID } from 'ethr-did';
 import { Resolver, DIDDocument } from 'did-resolver'
 import { getResolver } from 'ethr-did-resolver'
 import { JwtCredentialPayload, createVerifiableCredentialJwt, Issuer } from 'did-jwt-vc'
 
-export function createNewEthDID() {
+export function createNewEthDID(): tm.DIDInfo {
     const keypair = EthrDID.createKeyPair();
     const chainNameOrId = 'ropsten';
     const ethrDid = new EthrDID({...keypair, chainNameOrId});
 
-    return { did: ethrDid, ...keypair };
+    return {
+        did: ethrDid.did,
+        walletAddress: keypair.address,
+        privKey: keypair.privateKey,
+        pubKey: keypair.publicKey
+    } as tm.DIDInfo;
 }
 
-export async function resolveDID(did: string): Promise<DIDDocument|null> {
+export async function resolveDID(did: tm.did_t): Promise<DIDDocument|null> {
     const infuraProjectID = process.env.INFURA_PID;
     if(!infuraProjectID) {
         console.error("[error] Infura project ID not set")
@@ -28,16 +34,16 @@ export async function resolveDID(did: string): Promise<DIDDocument|null> {
 /**
  * Create VC for holder by issuer
  * @see https://github.com/decentralized-identity/did-jwt-vc#creating-jwts
- * @param holderDID     string  DID for VC holder
- * @param claim         object  Claim for VC holder
- * @param issuerDID     string  DID for VC issuer
- * @param issuerPrivkey string  Private key for VC issuer
+ * @param holderDID     did_t   DID for VC holder
+ * @param claim         claim_t Claim for VC holder
+ * @param issuerDID     did_t   DID for VC issuer
+ * @param issuerPrivkey did_t   Private key for VC issuer
  */
 export async function createVC(
-    holderDID: string,
-    claim: object,
-    issuerDID: string,
-    issuerPrivkey: string): Promise<string> {
+    holderDID: tm.did_t,
+    claim: tm.claim_t,
+    issuerDID: tm.did_t,
+    issuerPrivkey: tm.did_t): Promise<tm.vcJwt_t> {
 
     // Create EthDID obj for issuer
     const issuer = new EthrDID({
