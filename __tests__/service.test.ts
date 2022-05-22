@@ -8,10 +8,10 @@ test('DID resolving test', async () => {
 });
 
 // Wrong DID test
-test('Wrong DID test', async () => {
-  expect(await service.resolveDID(
-        'wrong-identifier'
-  )).toThrowError('Cannot resolve DID');
+test('Wrong DID test', () => {
+  expect(async () => {
+      await service.resolveDID('wrong-identifier')
+  }).rejects.toThrowError('Cannot resolve DID');
 });
 
 // Create VC test
@@ -56,6 +56,8 @@ describe('Environment dependent testing', () => {
 
   test('Should throw error when INFURA_PID is not set', () => {
       process.env.INFURA_PID = '';
-      expect(service.getInfuraResolver()).toThrowError("Cannot import Infura project ID");
+      expect(() => {
+          service.getInfuraResolver()
+      }).toThrowError('Cannot import Infura project ID');
   });
 });
