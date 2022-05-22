@@ -33,7 +33,13 @@ export function createNewEthDID(): tm.DIDInfo {
     } as tm.DIDInfo;
 }
 
-export function getInfuraResolver(): Resolver {
+/**
+ * Get resolver object with infura provider
+ * @see https://github.com/decentralized-identity/did-jwt-vc#prerequisites-1
+ * @param chainName string  Optional parameter for chain name (default: ropsten)
+ * @return Resolver
+ */
+export function getInfuraResolver(chainName?: string): Resolver {
     // Get Infura.io project ID
     const infuraProjectID = process.env.INFURA_PID;
     if(!infuraProjectID) {
@@ -43,8 +49,9 @@ export function getInfuraResolver(): Resolver {
     }
 
     // Get resolver
-    const rpcUrl = "https://ropsten.infura.io/v3/" + infuraProjectID;
-    return new Resolver(getResolver({ rpcUrl, name: CHAIN }));
+    const name = chainName || CHAIN;
+    const rpcUrl = `https://${name}.infura.io/v3/${infuraProjectID}`;
+    return new Resolver(getResolver({ name, rpcUrl }));
 }
 
 /**
