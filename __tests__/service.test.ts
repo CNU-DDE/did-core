@@ -46,6 +46,8 @@ describe('Test group #2: VC test', () => {
     });
 
     // Verify VC test
+    // TODO: verification is failed because the resolver is configured to use ropsten, not mainnet
+    //      but sample key is on mainnet
     test('Should verify VC successfully', async () => {
         const testVC = "eyJhbGciOiJFUzI1NkstUiIsInR5cCI6IkpXVCJ9.eyJ2YyI6eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSJdLCJ0eXBlIjpbIlZlcmlmaWFibGVDcmVkZW50aWFsIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7ImRlZ3JlZSI6eyJ0eXBlIjoiQmFjaGVsb3JEZWdyZWUiLCJuYW1lIjoiQ1NFIn19fSwic3ViIjoiZGlkOmV0aHI6MHg0MzVkZjNlZGE1NzE1NGNmOGNmNzkyNjA3OTg4MWYyOTEyZjU0ZGI0IiwibmJmIjoxNTYyOTUwMjgyLCJpc3MiOiJkaWQ6ZXRocjoweEYxMjMyRjg0MGYzYUQ3ZDIzRmNEYUE4NGQ2QzY2ZGFjMjRFRmIxOTgifQ.La-maDcP8NXaucFDwSK-rD4DYmcIvBCQa4CA3q-05bCzdHHf6ZSdHQWMJuwn34vIMAl6tBCS992QKrWwEZT5QQA";
         expect(await service.verifyVC(testVC)).toBeTruthy();
