@@ -7,6 +7,14 @@ test('DID resolving test', async () => {
   )).toBeTruthy();
 });
 
+// Wrong DID test
+test('Wrong DID test', async () => {
+  expect(await service.resolveDID(
+        'wrong-identifier'
+  )).toThrowError('Cannot resolve DID');
+});
+
+// Create VC test
 test('Creating VC test', async () => {
     expect(await service.createVC(
         'did:ethr:0x435df3eda57154cf8cf7926079881f2912f54db4',
@@ -21,7 +29,8 @@ test('Creating VC test', async () => {
     )).toBeTruthy();
 });
 
-test('Creating VC test', async () => {
+// Create VP test
+test('Creating VP test', async () => {
     const testVC = "eyJhbGciOiJFUzI1NkstUiIsInR5cCI6IkpXVCJ9.eyJ2YyI6eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSJdLCJ0eXBlIjpbIlZlcmlmaWFibGVDcmVkZW50aWFsIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7ImRlZ3JlZSI6eyJ0eXBlIjoiQmFjaGVsb3JEZWdyZWUiLCJuYW1lIjoiQ1NFIn19fSwic3ViIjoiZGlkOmV0aHI6MHg0MzVkZjNlZGE1NzE1NGNmOGNmNzkyNjA3OTg4MWYyOTEyZjU0ZGI0IiwibmJmIjoxNTYyOTUwMjgyLCJpc3MiOiJkaWQ6ZXRocjoweEYxMjMyRjg0MGYzYUQ3ZDIzRmNEYUE4NGQ2QzY2ZGFjMjRFRmIxOTgifQ.La-maDcP8NXaucFDwSK-rD4DYmcIvBCQa4CA3q-05bCzdHHf6ZSdHQWMJuwn34vIMAl6tBCS992QKrWwEZT5QQA";
 
     expect(await service.createVP(
@@ -29,4 +38,24 @@ test('Creating VC test', async () => {
         'd8b595680851765f38ea5405129244ba3cbad84467d190859f4c8b20c1ff6c75',
         [ testVC ]
     )).toBeTruthy();
+});
+
+// Env-related testing
+// Reference: https://stackoverflow.com/a/48042799
+describe('Environment dependent testing', () => {
+  const OLD_ENV = process.env;
+
+  beforeEach(() => {
+    jest.resetModules() // Most important - it clears the cache
+    process.env = { ...OLD_ENV }; // Make a copy
+  });
+
+  afterAll(() => {
+    process.env = OLD_ENV; // Restore old environment
+  });
+
+  test('Should throw error when INFURA_PID is not set', () => {
+      process.env.INFURA_PID = '';
+      expect(service.getInfuraResolver()).toThrowError("Cannot import Infura project ID");
+  });
 });
