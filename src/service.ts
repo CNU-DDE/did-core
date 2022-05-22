@@ -7,7 +7,9 @@ import {
     JwtPresentationPayload,
     createVerifiableCredentialJwt,
     createVerifiablePresentationJwt,
-    Issuer
+    Issuer,
+    verifyCredential,
+    VerifiedCredential
 } from 'did-jwt-vc'
 
 const CHAIN = 'ropsten';
@@ -105,6 +107,14 @@ export async function createVC(
       }
     }
     return await createVerifiableCredentialJwt(vcPayload, issuer)
+}
+
+export async function verifyVC(vcJwt: tm.vcJwt_t): Promise<VerifiedCredential> {
+    return await verifyCredential(vcJwt, getInfuraResolver())
+        .catch((err) => {
+            console.error(err);
+            throw new Error('Cannot verify VC');
+        });
 }
 
 /**
