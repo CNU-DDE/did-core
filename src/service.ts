@@ -33,29 +33,38 @@ export function createNewEthDID(): tm.DIDInfo {
     } as tm.DIDInfo;
 }
 
+export function getInfuraResolver(): Resolver {
+    // Get Infura.io project ID
+    const infuraProjectID = process.env.INFURA_PID;
+    if(!infuraProjectID) {
+        console.error("[error] Infura project ID not set")
+        console.error("[error] * do: 'export INFURA_PID=${Infura_project_ID_here}'")
+        throw new Error("Cannot import Infura project ID");
+    }
+
+    // Get resolver
+    const rpcUrl = "https://ropsten.infura.io/v3/" + infuraProjectID;
+    return new Resolver(getResolver({ rpcUrl, name: CHAIN }));
+}
+
 /**
  * Resolve DID to DID Document
  * @see Official guide: https://github.com/uport-project/ethr-did/blob/master/docs/guides/index.md#resolving-the-did-document
  * @param   identity    identifier_t    DID method-specific identifier
  * @return  Promise<DIDDocument|null>   Return resolved DID document or null when the DID document is not found
  */
-export async function resolveDID(identity: tm.identifier_t): Promise<DIDDocument|null> {
+export async function resolveDID(identity: tm.identifier_t): Promise<DIDDocument> {
 
-    // Get Infura.io project ID
-    const infuraProjectID = process.env.INFURA_PID;
-    if(!infuraProjectID) {
-        console.error("[error] Infura project ID not set")
-        console.error("[error] * do: 'export INFURA_PID=${Infura_project_ID_here}'")
-        return null;
+    const did = `did:ethr:${CHAIN}:${identity}`;
+    const didResolver = getInfuraResolver();
+    // Resolve
+    const didDoc = (await didResolver.resolve(did)).didDocument;
+
+    if(!didDoc) {
+        throw new Error('Cannot resolve DID');
     }
 
-    // Get resolver
-    const did = `did:ethr:${CHAIN}:${identity}`;
-    const rpcUrl = "https://ropsten.infura.io/v3/" + infuraProjectID;
-    const didResolver = new Resolver(getResolver({ rpcUrl, name: CHAIN }));
-
-    // Resolve
-    return (await didResolver.resolve(did)).didDocument;
+    return didDoc;
 }
 
 /**
