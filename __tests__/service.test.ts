@@ -18,10 +18,12 @@ describe('Test group #1: DID and DID resolving', () => {
 
     // Wrong Infura project id test
     test('Should throw error when INFURA_PID is not set', () => {
+        const OLD_ENV = process.env.INFURA_PID;
         process.env.INFURA_PID = '';
         expect(() => {
             service.getInfuraResolver()
         }).toThrowError('Cannot import Infura project ID');
+        process.env.INFURA_PID = OLD_ENV;
     });
 
 });
