@@ -9,7 +9,9 @@ import {
     createVerifiablePresentationJwt,
     Issuer,
     verifyCredential,
-    VerifiedCredential
+    verifyPresentation,
+    VerifiedCredential,
+    VerifiedPresentation
 } from 'did-jwt-vc'
 
 const CHAIN = 'ropsten';
@@ -45,8 +47,8 @@ export function getInfuraResolver(chainName?: string): Resolver {
     // Get Infura.io project ID
     const infuraProjectID = process.env.INFURA_PID;
     if(!infuraProjectID) {
-        console.error("[error] Infura project ID not set")
-        console.error("[error] * do: 'export INFURA_PID=${Infura_project_ID_here}'")
+        console.warn("[error] Infura project ID not set")
+        console.warn("[error] * do: 'export INFURA_PID=${Infura_project_ID_here}'")
         throw new Error("Cannot import Infura project ID");
     }
 
@@ -112,7 +114,7 @@ export async function createVC(
 export async function verifyVC(vcJwt: tm.vcJwt_t): Promise<VerifiedCredential> {
     return await verifyCredential(vcJwt, getInfuraResolver())
         .catch((err) => {
-            console.error(err);
+            console.warn(err);
             throw new Error('Cannot verify VC');
         });
 }
@@ -147,4 +149,12 @@ export async function createVP(
     };
 
     return await createVerifiablePresentationJwt(vpPayload, holder);
+}
+
+export async function verifyVP(vpJwt: tm.vpJwt_t): Promise<VerifiedPresentation> {
+    return await verifyPresentation(vpJwt, getInfuraResolver())
+        .catch((err) => {
+            console.warn(err);
+            throw new Error('Cannot verify VP');
+        });
 }

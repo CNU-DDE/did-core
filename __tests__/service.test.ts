@@ -76,4 +76,20 @@ describe('Test group #3: VP test', () => {
         )).toBeTruthy();
     });
 
+    // Verify VP test
+    // TODO: verification is failed because the resolver is configured to use ropsten, not mainnet
+    //      but sample key is on mainnet
+    test('Should verify VP successfully', async () => {
+        const testVP = "eyJhbGciOiJFUzI1NkstUiIsInR5cCI6IkpXVCJ9.eyJ2cCI6eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSJdLCJ0eXBlIjpbIlZlcmlmaWFibGVQcmVzZW50YXRpb24iXSwidmVyaWZpYWJsZUNyZWRlbnRpYWwiOlsiZXlKaGJHY2lPaUpGVXpJMU5rc3RVaUlzSW5SNWNDSTZJa3BYVkNKOS5leUoyWXlJNmV5SkFZMjl1ZEdWNGRDSTZXeUpvZEhSd2N6b3ZMM2QzZHk1M015NXZjbWN2TWpBeE9DOWpjbVZrWlc1MGFXRnNjeTkyTVNKZExDSjBlWEJsSWpwYklsWmxjbWxtYVdGaWJHVkRjbVZrWlc1MGFXRnNJbDBzSW1OeVpXUmxiblJwWVd4VGRXSnFaV04wSWpwN0ltUmxaM0psWlNJNmV5SjBlWEJsSWpvaVFtRmphR1ZzYjNKRVpXZHlaV1VpTENKdVlXMWxJam9pUTFORkluMTlmU3dpYzNWaUlqb2laR2xrT21WMGFISTZNSGcwTXpWa1pqTmxaR0UxTnpFMU5HTm1PR05tTnpreU5qQTNPVGc0TVdZeU9URXlaalUwWkdJMElpd2libUptSWpveE5UWXlPVFV3TWpneUxDSnBjM01pT2lKa2FXUTZaWFJvY2pvd2VFWXhNak15UmpnME1HWXpZVVEzWkRJelJtTkVZVUU0TkdRMlF6WTJaR0ZqTWpSRlJtSXhPVGdpZlEuTGEtbWFEY1A4TlhhdWNGRHdTSy1yRDREWW1jSXZCQ1FhNENBM3EtMDViQ3pkSEhmNlpTZEhRV01KdXduMzR2SU1BbDZ0QkNTOTkyUUtyV3dFWlQ1UVFBIl19LCJpc3MiOiJkaWQ6ZXRocjoweEYxMjMyRjg0MGYzYUQ3ZDIzRmNEYUE4NGQ2QzY2ZGFjMjRFRmIxOTgifQ.LN2gtVLkEISqjmByzySUm9s-fBXPyFqgv20R0bzDBvTem2HSTMJlHCiUBI3iWfqzO9uI8Kk-DDnw-M9GnA1CKwE";
+        expect(await service.verifyVP(testVP)).toBeTruthy();
+    });
+
+    // Verify failure test
+    test('Should not verify VP and throw error', async () => {
+        const testVP = "eyJhbGcioiJFUzI1NkstUiIsInR5cCI6IkpXVCJ9.eyJ2cCI6eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSJdLCJ0eXBlIjpbIlZlcmlmaWFibGVQcmVzZW50YXRpb24iXSwidmVyaWZpYWJsZUNyZWRlbnRpYWwiOlsiZXlKaGJHY2lPaUpGVXpJMU5rc3RVaUlzSW5SNWNDSTZJa3BYVkNKOS5leUoyWXlJNmV5SkFZMjl1ZEdWNGRDSTZXeUpvZEhSd2N6b3ZMM2QzZHk1M015NXZjbWN2TWpBeE9DOWpjbVZrWlc1MGFXRnNjeTkyTVNKZExDSjBlWEJsSWpwYklsWmxjbWxtYVdGaWJHVkRjbVZrWlc1MGFXRnNJbDBzSW1OeVpXUmxiblJwWVd4VGRXSnFaV04wSWpwN0ltUmxaM0psWlNJNmV5SjBlWEJsSWpvaVFtRmphR1ZzYjNKRVpXZHlaV1VpTENKdVlXMWxJam9pUTFORkluMTlmU3dpYzNWaUlqb2laR2xrT21WMGFISTZNSGcwTXpWa1pqTmxaR0UxTnpFMU5HTm1PR05tTnpreU5qQTNPVGc0TVdZeU9URXlaalUwWkdJMElpd2libUptSWpveE5UWXlPVFV3TWpneUxDSnBjM01pT2lKa2FXUTZaWFJvY2pvd2VFWXhNak15UmpnME1HWXpZVVEzWkRJelJtTkVZVUU0TkdRMlF6WTJaR0ZqTWpSRlJtSXhPVGdpZlEuTGEtbWFEY1A4TlhhdWNGRHdTSy1yRDREWW1jSXZCQ1FhNENBM3EtMDViQ3pkSEhmNlpTZEhRV01KdXduMzR2SU1BbDZ0QkNTOTkyUUtyV3dFWlQ1UVFBIl19LCJpc3MiOiJkaWQ6ZXRocjoweEYxMjMyRjg0MGYzYUQ3ZDIzRmNEYUE4NGQ2QzY2ZGFjMjRFRmIxOTgifQ.LN2gtVLkEISqjmByzySUm9s-fBXPyFqgv20R0bzDBvTem2HSTMJlHCiUBI3iWfqzO9uI8Kk-DDnw-M9GnA1CKwE";
+        expect(async () => {
+            await service.verifyVP(testVP)
+        }).rejects.toThrowError('Cannot verify VP');
+    });
+
 });
