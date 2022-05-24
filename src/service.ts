@@ -82,16 +82,16 @@ export async function resolveDID(identity: tm.identifier_t): Promise<DIDDocument
 /**
  * Create VC for holder by issuer
  * @see https://github.com/decentralized-identity/did-jwt-vc#creating-a-verifiable-credential
- * @param holderDID     did_t   DID for VC holder
- * @param claim         claim_t Claim for VC holder
- * @param issuerDID     did_t   DID for VC issuer
- * @param issuerPrivkey did_t   Private key for VC issuer
+ * @param holderDID     did_t       DID for VC holder
+ * @param claim         claim_t     Claim for VC holder
+ * @param issuerDID     did_t       DID for VC issuer
+ * @param issuerPrivkey privKey_t   Private key for VC issuer
  */
 export async function createVC(
     holderDID: tm.did_t,
     claim: tm.claim_t,
     issuerDID: tm.did_t,
-    issuerPrivkey: tm.did_t): Promise<tm.vcJwt_t> {
+    issuerPrivkey: tm.privKey_t): Promise<tm.vcJwt_t> {
 
     // Create EthDID obj for issuer
     const issuer = new EthrDID({
