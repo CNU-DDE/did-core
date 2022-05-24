@@ -10,10 +10,17 @@ declare module 'did-core' {
         type identifier_t = string;
 
         interface DIDInfo {
-            did: did_t;
-            walletAddress: address_t;
-            privKey: privKey_t;
-            pubKey: pubKey_t;
+            did:            did_t;
+            walletAddress:  address_t;
+            privKey:        privKey_t;
+            pubKey:         pubKey_t;
+        }
+
+        interface PostVCRequestBody {
+            holderDID:  did_t;
+            claim:      claim_t;
+            issuerDID:  did_t;
+            issuerPriv: privKey_t;
         }
     }
 }

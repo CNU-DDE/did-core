@@ -12,6 +12,10 @@ class BaseError extends Error {
         this.httpStatusCode = code;
         this.httpStatusMessage = getReasonPhrase(code);
     }
+
+    compareErrorWith(err: Error): boolean {
+        return this.message === err.message;
+    }
 }
 
 export class InfuraProjectIdImportFailureError extends BaseError {
