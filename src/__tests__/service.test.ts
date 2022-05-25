@@ -1,4 +1,5 @@
-import * as service from '../src/service'
+import * as service from '../service'
+import * as errors from '../errors'
 
 describe('Test group #1: DID and DID resolving', () => {
 
@@ -13,7 +14,7 @@ describe('Test group #1: DID and DID resolving', () => {
     test('Should throw error for wrong identifier', () => {
         expect(async () => {
             await service.resolveDID('wrong-identifier')
-        }).rejects.toThrowError('Cannot resolve DID');
+        }).rejects.toThrowError(new errors.ResolveDIDFailureError());
     });
 
     // Wrong Infura project id test
@@ -22,7 +23,7 @@ describe('Test group #1: DID and DID resolving', () => {
         process.env.INFURA_PID = '';
         expect(() => {
             service.getInfuraResolver()
-        }).toThrowError('Cannot import Infura project ID');
+        }).toThrowError(new errors.InfuraProjectIdImportFailureError());
         process.env.INFURA_PID = OLD_ENV;
     });
 
@@ -58,7 +59,7 @@ describe('Test group #2: VC test', () => {
         const testVC = "eyJhbGciOiJFVzI1NkstUiIsInR5cCI6IkpXVCJ9.eyJ2YyI6eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSJdLCJ0eXBlIjpbIlZlcmlmaWFibGVDcmVkZW50aWFsIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7ImRlZ3JlZSI6eyJ0eXBlIjoiQmFjaGVsb3JEZWdyZWUiLCJuYW1lIjoiQ1NFIn19fSwic3ViIjoiZGlkOmV0aHI6MHg0MzVkZjNlZGE1NzE1NGNmOGNmNzkyNjA3OTg4MWYyOTEyZjU0ZGI0IiwibmJmIjoxNTYyOTUwMjgyLCJpc3MiOiJkaWQ6ZXRocjoweEYxMjMyRjg0MGYzYUQ3ZDIzRmNEYUE4NGQ2QzY2ZGFjMjRFRmIxOTgifQ.La-maDcP8NXaucFDwSK-rD4DYmcIvBCQa4CA3q-05bCzdHHf6ZSdHQWMJuwn34vIMAl6tBCS992QKrWwEZT5QQA";
         expect(async () => {
             await service.verifyVC(testVC)
-        }).rejects.toThrowError('Cannot verify VC');
+        }).rejects.toThrowError(new errors.VerifyVCFailureError());
     });
 
 });
@@ -89,7 +90,7 @@ describe('Test group #3: VP test', () => {
         const testVP = "eyJhbGcioiJFUzI1NkstUiIsInR5cCI6IkpXVCJ9.eyJ2cCI6eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSJdLCJ0eXBlIjpbIlZlcmlmaWFibGVQcmVzZW50YXRpb24iXSwidmVyaWZpYWJsZUNyZWRlbnRpYWwiOlsiZXlKaGJHY2lPaUpGVXpJMU5rc3RVaUlzSW5SNWNDSTZJa3BYVkNKOS5leUoyWXlJNmV5SkFZMjl1ZEdWNGRDSTZXeUpvZEhSd2N6b3ZMM2QzZHk1M015NXZjbWN2TWpBeE9DOWpjbVZrWlc1MGFXRnNjeTkyTVNKZExDSjBlWEJsSWpwYklsWmxjbWxtYVdGaWJHVkRjbVZrWlc1MGFXRnNJbDBzSW1OeVpXUmxiblJwWVd4VGRXSnFaV04wSWpwN0ltUmxaM0psWlNJNmV5SjBlWEJsSWpvaVFtRmphR1ZzYjNKRVpXZHlaV1VpTENKdVlXMWxJam9pUTFORkluMTlmU3dpYzNWaUlqb2laR2xrT21WMGFISTZNSGcwTXpWa1pqTmxaR0UxTnpFMU5HTm1PR05tTnpreU5qQTNPVGc0TVdZeU9URXlaalUwWkdJMElpd2libUptSWpveE5UWXlPVFV3TWpneUxDSnBjM01pT2lKa2FXUTZaWFJvY2pvd2VFWXhNak15UmpnME1HWXpZVVEzWkRJelJtTkVZVUU0TkdRMlF6WTJaR0ZqTWpSRlJtSXhPVGdpZlEuTGEtbWFEY1A4TlhhdWNGRHdTSy1yRDREWW1jSXZCQ1FhNENBM3EtMDViQ3pkSEhmNlpTZEhRV01KdXduMzR2SU1BbDZ0QkNTOTkyUUtyV3dFWlQ1UVFBIl19LCJpc3MiOiJkaWQ6ZXRocjoweEYxMjMyRjg0MGYzYUQ3ZDIzRmNEYUE4NGQ2QzY2ZGFjMjRFRmIxOTgifQ.LN2gtVLkEISqjmByzySUm9s-fBXPyFqgv20R0bzDBvTem2HSTMJlHCiUBI3iWfqzO9uI8Kk-DDnw-M9GnA1CKwE";
         expect(async () => {
             await service.verifyVP(testVP)
-        }).rejects.toThrowError('Cannot verify VP');
+        }).rejects.toThrowError(new errors.VerifyVPFailureError());
     });
 
 });

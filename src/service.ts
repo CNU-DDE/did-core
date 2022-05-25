@@ -2,6 +2,7 @@ import { typeManifest as tm } from 'did-core';
 import { EthrDID } from 'ethr-did';
 import { Resolver, DIDDocument } from 'did-resolver'
 import { getResolver } from 'ethr-did-resolver'
+import * as et from './errors';
 import {
     JwtCredentialPayload,
     JwtPresentationPayload,
@@ -49,7 +50,7 @@ export function getInfuraResolver(chainName?: string): Resolver {
     if(!infuraProjectID) {
         console.warn("[error] Infura project ID not set")
         console.warn("[error] * do: 'export INFURA_PID=${Infura_project_ID_here}'")
-        throw new Error("Cannot import Infura project ID");
+        throw new et.InfuraProjectIdImportFailureError();
     }
 
     // Get resolver
@@ -65,14 +66,14 @@ export function getInfuraResolver(chainName?: string): Resolver {
  * @return  Promise<DIDDocument|null>   Return resolved DID document or null when the DID document is not found
  */
 export async function resolveDID(identity: tm.identifier_t): Promise<DIDDocument> {
-
+    // Get resolver
     const did = `did:ethr:${CHAIN}:${identity}`;
     const didResolver = getInfuraResolver();
     // Resolve
     const didDoc = (await didResolver.resolve(did)).didDocument;
 
     if(!didDoc) {
-        throw new Error('Cannot resolve DID');
+        throw new et.ResolveDIDFailureError();
     }
 
     return didDoc;
@@ -81,16 +82,16 @@ export async function resolveDID(identity: tm.identifier_t): Promise<DIDDocument
 /**
  * Create VC for holder by issuer
  * @see https://github.com/decentralized-identity/did-jwt-vc#creating-a-verifiable-credential
- * @param holderDID     did_t   DID for VC holder
- * @param claim         claim_t Claim for VC holder
- * @param issuerDID     did_t   DID for VC issuer
- * @param issuerPrivkey did_t   Private key for VC issuer
+ * @param holderDID     did_t       DID for VC holder
+ * @param claim         claim_t     Claim for VC holder
+ * @param issuerDID     did_t       DID for VC issuer
+ * @param issuerPrivkey privKey_t   Private key for VC issuer
  */
 export async function createVC(
     holderDID: tm.did_t,
     claim: tm.claim_t,
     issuerDID: tm.did_t,
-    issuerPrivkey: tm.did_t): Promise<tm.vcJwt_t> {
+    issuerPrivkey: tm.privKey_t): Promise<tm.vcJwt_t> {
 
     // Create EthDID obj for issuer
     const issuer = new EthrDID({
@@ -121,7 +122,7 @@ export async function verifyVC(vcJwt: tm.vcJwt_t): Promise<VerifiedCredential> {
     return await verifyCredential(vcJwt, getInfuraResolver())
     .catch((err) => {
         console.warn(err);
-        throw new Error('Cannot verify VC');
+        throw new et.VerifyVCFailureError();
     });
 }
 
@@ -167,6 +168,6 @@ export async function verifyVP(vpJwt: tm.vpJwt_t): Promise<VerifiedPresentation>
     return await verifyPresentation(vpJwt, getInfuraResolver())
     .catch((err) => {
         console.warn(err);
-        throw new Error('Cannot verify VP');
+        throw new et.VerifyVPFailureError();
     });
 }

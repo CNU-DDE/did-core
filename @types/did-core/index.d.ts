@@ -10,10 +10,31 @@ declare module 'did-core' {
         type identifier_t = string;
 
         interface DIDInfo {
-            did: did_t;
-            walletAddress: address_t;
-            privKey: privKey_t;
-            pubKey: pubKey_t;
+            did:            did_t;
+            walletAddress:  address_t;
+            privKey:        privKey_t;
+            pubKey:         pubKey_t;
+        }
+
+        interface PostVerifiableCredentialRequestBody {
+            holderDID:  did_t;
+            claim:      claim_t;
+            issuerDID:  did_t;
+            issuerPriv: privKey_t;
+        }
+
+        interface PostVerifiablePresentationRequestBody {
+            holderDID:              did_t;
+            holderPriv:             privKey_t;
+            verifiableCredentials:  vcJwt_t[];
+        }
+
+        interface PostVerifiedCredentialRequestBody {
+            verifiableCredential:   vcJwt_t;
+        }
+
+        interface PostVerifiedPresentationRequestBody {
+            verifiablePresentation: vpJwt_t;
         }
     }
 }
