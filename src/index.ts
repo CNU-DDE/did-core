@@ -109,6 +109,13 @@ app.post('/ssi/verifiable-credential', (req, res) => {
     });
 });
 
+/**
+ * [POST] /ssi/verifiable-presentation
+ * @param pathVariable  nil
+ * @param queryString   nil
+ * @param reqBody       { holderDID: string, holderPriv: string, verifiableCredentials: []string }
+ * @return { error: ErrorMessage, content: VerifiedVC }
+ */
 app.post('/ssi/verifiable-presentation', (req, res) => {
     const {
         holderDID,
@@ -131,6 +138,13 @@ app.post('/ssi/verifiable-presentation', (req, res) => {
     });
 });
 
+/**
+ * [POST] /ssi/verified-credential
+ * @param pathVariable  nil
+ * @param queryString   nil
+ * @param reqBody       { verifiableCredential: string }
+ * @return { error: ErrorMessage, content: VerifiedVC }
+ */
 app.post('/ssi/verified-credential', (req, res) => {
     const {
         verifiableCredential,
@@ -159,6 +173,13 @@ app.post('/ssi/verified-credential', (req, res) => {
     });
 });
 
+/**
+ * [POST] /ssi/verified-presentation
+ * @param pathVariable  nil
+ * @param queryString   nil
+ * @param reqBody       { verifiablePresentation: string }
+ * @return { error: ErrorMessage, content: VerifiedVP }
+ */
 app.post('/ssi/verified-presentation', (req, res) => {
     const {
         verifiablePresentation,
