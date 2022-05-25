@@ -92,7 +92,7 @@ app.post('/ssi/verifiable-credential', (req, res) => {
         claim,
         issuerDID,
         issuerPriv,
-    } = req.body as tm.PostVCRequestBody;
+    } = req.body as tm.PostVerifiableCredentialRequestBody;
     service.createVC(holderDID, claim, issuerDID, issuerPriv)
     .then((vc) => {
         res.send(JSON.stringify({
@@ -114,7 +114,7 @@ app.post('/ssi/verifiable-presentation', (req, res) => {
         holderDID,
         holderPriv,
         verifiableCredentials,
-    } = req.body as tm.PostVPRequestBody;
+    } = req.body as tm.PostVerifiablePresentationRequestBody;
     service.createVP(holderDID, holderPriv, verifiableCredentials)
     .then((vp) => {
         res.send(JSON.stringify({

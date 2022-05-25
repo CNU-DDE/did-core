@@ -16,17 +16,25 @@ declare module 'did-core' {
             pubKey:         pubKey_t;
         }
 
-        interface PostVCRequestBody {
+        interface PostVerifiableCredentialRequestBody {
             holderDID:  did_t;
             claim:      claim_t;
             issuerDID:  did_t;
             issuerPriv: privKey_t;
         }
 
-        interface PostVPRequestBody {
+        interface PostVerifiablePresentationRequestBody {
             holderDID:              did_t;
             holderPriv:             privKey_t;
             verifiableCredentials:  vcJwt_t[];
+        }
+
+        interface PostVerifiedCredentialRequestBody {
+            verifiableCredential:  vcJwt_t;
+        }
+
+        interface PostVerifiedPresentationRequestBody {
+            verifiablePresentation:  vpJwt_t;
         }
     }
 }
