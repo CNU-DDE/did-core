@@ -42,3 +42,4 @@ test/*.js
 # Custom
 dist
 *.swp
+secret
