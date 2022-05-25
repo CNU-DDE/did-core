@@ -160,6 +160,31 @@ app.post('/ssi/verified-credential', (req, res) => {
 });
 
 app.post('/ssi/verified-presentation', (req, res) => {
+    const {
+        verifiablePresentation,
+    } = req.body as tm.PostVerifiedPresentationRequestBody;
+    service.verifyVP(verifiablePresentation)
+    .then((vp) => {
+        res.send(JSON.stringify({
+            error: null,
+            content: vp,
+        }));
+    }).catch((err: Error) => {
+        if(err instanceof errors.VerifyVPFailureError) {
+            res.status(err.httpStatusCode)
+            .send(JSON.stringify({
+                error: err.message,
+                content: null,
+            }));
+        } else {
+            const wrapped = new errors.UnhandledError(err);
+            res.status(wrapped.httpStatusCode)
+            .send(JSON.stringify({
+                error: wrapped.message,
+                content: null,
+            }));
+        }
+    });
 });
 
 // Start server

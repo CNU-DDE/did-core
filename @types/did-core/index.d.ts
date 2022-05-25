@@ -30,11 +30,11 @@ declare module 'did-core' {
         }
 
         interface PostVerifiedCredentialRequestBody {
-            verifiableCredential:  vcJwt_t;
+            verifiableCredential:   vcJwt_t;
         }
 
         interface PostVerifiedPresentationRequestBody {
-            verifiablePresentation:  vpJwt_t;
+            verifiablePresentation: vpJwt_t;
         }
     }
 }
