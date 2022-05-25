@@ -94,7 +94,7 @@ app.post('/ssi/verifiable-credential', (req, res) => {
         issuerPriv,
     } = req.body as tm.PostVCRequestBody;
     service.createVC(holderDID, claim, issuerDID, issuerPriv)
-    .then(vc => {
+    .then((vc) => {
         res.send(JSON.stringify({
             error: null,
             content: vc,
@@ -107,6 +107,34 @@ app.post('/ssi/verifiable-credential', (req, res) => {
             content: null,
         }));
     });
+});
+
+app.post('/ssi/verifiable-presentation', (req, res) => {
+    const {
+        holderDID,
+        holderPriv,
+        verifiableCredentials,
+    } = req.body as tm.PostVPRequestBody;
+    service.createVP(holderDID, holderPriv, verifiableCredentials)
+    .then((vp) => {
+        res.send(JSON.stringify({
+            error: null,
+            content: vp,
+        }));
+    }).catch((err: Error) => {
+        const wrapped = new errors.UnhandledError(err);
+        res.status(wrapped.httpStatusCode)
+        .send(JSON.stringify({
+            error: wrapped.message,
+            content: null,
+        }));
+    });
+});
+
+app.post('/ssi/verified-credential', (req, res) => {
+});
+
+app.post('/ssi/verified-presentation', (req, res) => {
 });
 
 // Start server

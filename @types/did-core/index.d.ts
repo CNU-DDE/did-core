@@ -22,5 +22,11 @@ declare module 'did-core' {
             issuerDID:  did_t;
             issuerPriv: privKey_t;
         }
+
+        interface PostVPRequestBody {
+            holderDID:              did_t;
+            holderPriv:             privKey_t;
+            verifiableCredentials:  vcJwt_t[];
+        }
     }
 }
