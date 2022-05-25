@@ -132,6 +132,31 @@ app.post('/ssi/verifiable-presentation', (req, res) => {
 });
 
 app.post('/ssi/verified-credential', (req, res) => {
+    const {
+        verifiableCredential,
+    } = req.body as tm.PostVerifiedCredentialRequestBody;
+    service.verifyVC(verifiableCredential)
+    .then((vc) => {
+        res.send(JSON.stringify({
+            error: null,
+            content: vc,
+        }));
+    }).catch((err: Error) => {
+        if(err instanceof errors.VerifyVCFailureError) {
+            res.status(err.httpStatusCode)
+            .send(JSON.stringify({
+                error: err.message,
+                content: null,
+            }));
+        } else {
+            const wrapped = new errors.UnhandledError(err);
+            res.status(wrapped.httpStatusCode)
+            .send(JSON.stringify({
+                error: wrapped.message,
+                content: null,
+            }));
+        }
+    });
 });
 
 app.post('/ssi/verified-presentation', (req, res) => {
