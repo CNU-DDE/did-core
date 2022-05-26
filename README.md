@@ -16,7 +16,7 @@ You must do `export INFURA_PID=${PROJECT_ID}` to run this.
 1. Install dependencies:
 
 ```bash
-npm install; git restore .
+npm install; git restore package*.json
 ```
 
 2. Build source
@@ -33,12 +33,12 @@ npm run start
 
 ## Usage
 
-As Injik/did-core is meant to use as a Kubernetes pod,
+As Injik/did-core is designed to use as a Kubernetes pod,
 it's packaged as a Docker image.
 
-You can found and use it in [Docker hub](https://hub.docker.com/r/haeramkeem/did-core)
+You can find and use it in [Docker hub](https://hub.docker.com/r/haeramkeem/did-core)
 
-Here's example of how to run container:
+Here's example of how to run a container:
 
 ```bash
 docker run -d \
