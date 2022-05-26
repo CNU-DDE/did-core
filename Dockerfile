@@ -9,7 +9,7 @@ RUN npm install
 RUN npm run build
 
 # Actual output image
-FROM node:16
+FROM node:16-slim
 
 LABEL name="Haeram Kim"
 LABEL email="haeram.kim1@gmail.com"
