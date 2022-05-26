@@ -6,7 +6,7 @@ describe('Test group #1: DID and DID resolving', () => {
     // DID resolving test
     test('Should resolve DID', async () => {
         expect(await service.resolveDID(
-            '0x031ef767936996de95f5be7b36fada08d070b97e85d874ce23e5f9fcbdf7149aa2'
+            'did:ethr:ropsten:0x031ef767936996de95f5be7b36fada08d070b97e85d874ce23e5f9fcbdf7149aa2'
         )).toBeTruthy();
     });
 

@@ -62,15 +62,18 @@ export function getInfuraResolver(chainName?: string): Resolver {
 /**
  * Resolve DID to DID Document
  * @see Official guide: https://github.com/uport-project/ethr-did/blob/master/docs/guides/index.md#resolving-the-did-document
- * @param   identity    identifier_t    DID method-specific identifier
+ * @param   identity    did_t           DID method-specific identifier
  * @return  Promise<DIDDocument|null>   Return resolved DID document or null when the DID document is not found
  */
-export async function resolveDID(identity: tm.identifier_t): Promise<DIDDocument> {
-    // Get resolver
-    const did = `did:ethr:${CHAIN}:${identity}`;
-    const didResolver = getInfuraResolver();
+export async function resolveDID(did: tm.did_t): Promise<DIDDocument> {
+    // Get network type
+    const parsed = (did as string).split(':');
+    const networkType = parsed.length == 4
+        ? parsed[2]     // Testnet
+        : 'mainnet';    // Mainnet
+
     // Resolve
-    const didDoc = (await didResolver.resolve(did)).didDocument;
+    const didDoc = (await getInfuraResolver(networkType).resolve(did)).didDocument;
 
     if(!didDoc) {
         throw new et.ResolveDIDFailureError();
