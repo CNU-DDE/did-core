@@ -3,6 +3,7 @@ import { EthrDID } from 'ethr-did';
 import { Resolver, DIDDocument } from 'did-resolver'
 import { getResolver } from 'ethr-did-resolver'
 import * as et from './app.errors';
+import settings from './settings';
 import {
     JwtCredentialPayload,
     JwtPresentationPayload,
@@ -49,17 +50,9 @@ export class AppService {
      * @return Resolver
      */
     getInfuraResolver(chainName?: string): Resolver {
-        // Get Infura.io project ID
-        const infuraProjectID = process.env.INFURA_PID;
-        if(!infuraProjectID) {
-            console.warn("[error] Infura project ID not set")
-            console.warn("[error] * do: 'export INFURA_PID=${Infura_project_ID_here}'")
-            throw new et.InfuraProjectIdImportFailureError();
-        }
-
         // Get resolver
         const name = chainName || CHAIN;
-        const rpcUrl = `https://${name}.infura.io/v3/${infuraProjectID}`;
+        const rpcUrl = `https://${name}.infura.io/v3/${settings.INFURA_PID}`;
         return new Resolver(getResolver({ name, rpcUrl }));
     }
 
