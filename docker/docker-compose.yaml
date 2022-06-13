@@ -1,6 +1,7 @@
 version: '3.9'
 
 services:
+  ## @services.mongodb MongoDB container for did-core
   mongo:
     container_name: mongodb
     image: haeramkeem/didcore-mongodb
@@ -15,6 +16,7 @@ services:
       - "MONGO_INITDB_USERNAME=${MONGODB_USER}"
       - "MONGO_INITDB_PASSWORD=${MONGODB_PASSWORD}"
       - "MONGO_INITDB_DATABASE=${MONGODB_DATABASE}"
+  ## @services.mongo-express MongoDB web browser
   mongo-express:
     container_name: mongoexpress
     image: mongo-express:1.0.0-alpha
@@ -27,5 +29,47 @@ services:
       - "ME_CONFIG_MONGODB_URL=mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@mongo:27017/${MONGODB_DATABASE}"
     depends_on:
       - mongo
+  ## @services.mariadb MariaDB for broccoli
+  mariadb:
+    container_name: mariadb
+    image: mariadb:10.8.2-rc-focal
+    volumes:
+      - mrdata:/var/lib/mysql
+    environment:
+      - "MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}"
+      - "MARIADB_USER=${MARIADB_USER}"
+      - "MARIADB_PASSWORD=${MARIADB_PASSWORD}"
+      - "MARIADB_DATABASE=${MARIADB_DATABASE}"
+    ports:
+      - 3306:3306
+  ## @services.did-core Old version of did-core container for SSI APIs
+  did-core:
+    container_name: did-core
+    image: haeramkeem/did-core
+    environment:
+      - "INFURA_PID=${INFURA_PID}"
+    ports:
+      - 7771:7771
+  ## @services.broccoli Broccoli microservice
+  broccoli:
+    container_name: broccoli
+    image: haeramkeem/broccoli
+    environment:
+      - "MARIADB_HOST=mariadb"
+      - "MARIADB_PORT=3306"
+      - "MARIADB_USER=${MARIADB_USER}"
+      - "MARIADB_PASSWORD=${MARIADB_PASSWORD}"
+      - "MARIADB_DATABASE=${MARIADB_DATABASE}"
+      - "RUNMODE=production"
+      - "DID_HOST=did-core"
+      - "DID_PORT=7771"
+      - "JWT_SECR=${JWT_SECR}"
+      - "FE_HOST=${FE_HOST}"
+      - "CORS_ALLOWED_HOST=${CORS_ALLOWED_HOST}"
+      - "CORS_ALLOWED_LOCAL_PORT=${CORS_ALLOWED_LOCAL_PORT}"
+    ports:
+        - ${FE_PORT}:7772
+    restart: always
 volumes:
   mgdata:
+  mrdata:
