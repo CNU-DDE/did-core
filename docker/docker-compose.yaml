@@ -3,13 +3,12 @@ version: '3.9'
 services:
   mongo:
     container_name: mongodb
-    image: mongo:5.0.9-focal
+    image: haeramkeem/didcore-mongodb
     restart: always
     ports:
       - 27017:27017
     volumes:
       - mgdata:/data/db
-      - ./initdb.d:/docker-entrypoint-initdb.d
     environment:
       - "MONGO_INITDB_ROOT_USERNAME=${MONGODB_ROOT_USER}"
       - "MONGO_INITDB_ROOT_PASSWORD=${MONGODB_ROOT_PASSWORD}"
