@@ -6,6 +6,9 @@ import { PostClaimDto } from './dto/post-claim.dto';
 import { sendBroccoliGetRequest } from 'src/httputils';
 import { PermissionDeniedError } from 'src/errors';
 
+const EMPLOYER = 0;
+const EMPLOYEE = 1;
+
 @Injectable()
 export class ClaimsService {
     constructor(@InjectModel(Claim.name) private claimModel: Model<Claim>) {}
@@ -18,7 +21,7 @@ export class ClaimsService {
         const holder = holderValidation.data.user_info;
 
         // Validate holder
-        if(holder.user_type != 1) {
+        if(holder.user_type != EMPLOYEE) {
             throw new PermissionDeniedError()
         }
 
@@ -26,7 +29,7 @@ export class ClaimsService {
         const issuer = issuerValidation.data.user_info;
 
         // Validate issuer
-        if(issuer.user_type != 0) {
+        if(issuer.user_type != EMPLOYER) {
             throw new PermissionDeniedError()
         }
 
