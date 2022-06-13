@@ -10,8 +10,9 @@ import { ClaimsService } from './claims.service';
 import { PostClaimDto } from './dto/post-claim.dto';
 import { BaseError, UnhandledError } from 'src/errors';
 import { AxiosError } from 'axios';
+import { getAPIVersion } from 'src/config/common.config';
 
-@Controller('claims')
+@Controller(`api/${getAPIVersion()}/claim`)
 export class ClaimsController {
     constructor(private readonly claimsService: ClaimsService) {}
 
