@@ -3,7 +3,7 @@ import {
     getReasonPhrase,
 } from 'http-status-codes';
 
-class BaseError extends Error {
+export class BaseError extends Error {
     httpStatusCode: number;
     httpStatusMessage: string;
 
@@ -39,6 +39,12 @@ export class VerifyVCFailureError extends BaseError {
 export class VerifyVPFailureError extends BaseError {
     constructor() {
         super(StatusCodes.BAD_REQUEST, 'Cannot verify VP');
+    }
+}
+
+export class PermissionDeniedError extends BaseError {
+    constructor() {
+        super(StatusCodes.BAD_REQUEST, 'Permission denied');
     }
 }
 

@@ -1,40 +1,45 @@
 declare module 'did-core' {
-    export namespace typeManifest {
-        type did_t = string;
-        type vcJwt_t = string;
-        type vpJwt_t = string;
-        type address_t = string;
-        type privKey_t = string;
-        type pubKey_t = string;
-        type claim_t = object;
-        type identifier_t = string;
+    export type did_t = string;
+    export type vcJwt_t = string;
+    export type vpJwt_t = string;
+    export type address_t = string;
+    export type privKey_t = string;
+    export type pubKey_t = string;
+    export type claim_t = object;
+    export type identifier_t = string;
 
-        interface DIDInfo {
-            did:            did_t;
-            walletAddress:  address_t;
-            privKey:        privKey_t;
-            pubKey:         pubKey_t;
-        }
+    export interface DIDInfo {
+        did:            did_t;
+        walletAddress:  address_t;
+        privKey:        privKey_t;
+        pubKey:         pubKey_t;
+    }
 
-        interface PostVerifiableCredentialRequestBody {
-            holderDID:  did_t;
-            claim:      claim_t;
-            issuerDID:  did_t;
-            issuerPriv: privKey_t;
-        }
+    export interface PostVerifiableCredentialRequestBody {
+        holderDID:  did_t;
+        claim:      claim_t;
+        issuerDID:  did_t;
+        issuerPriv: privKey_t;
+    }
 
-        interface PostVerifiablePresentationRequestBody {
-            holderDID:              did_t;
-            holderPriv:             privKey_t;
-            verifiableCredentials:  vcJwt_t[];
-        }
+    export interface PostVerifiablePresentationRequestBody {
+        holderDID:              did_t;
+        holderPriv:             privKey_t;
+        verifiableCredentials:  vcJwt_t[];
+    }
 
-        interface PostVerifiedCredentialRequestBody {
-            verifiableCredential:   vcJwt_t;
-        }
+    export interface PostVerifiedCredentialRequestBody {
+        verifiableCredential:   vcJwt_t;
+    }
 
-        interface PostVerifiedPresentationRequestBody {
-            verifiablePresentation: vpJwt_t;
-        }
+    export interface PostVerifiedPresentationRequestBody {
+        verifiablePresentation: vpJwt_t;
+    }
+
+    export interface ClaimContentInterface {
+        from:   string;
+        to:     string;
+        where:  string;
+        what:   string;
     }
 }

@@ -10,11 +10,16 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
     "typeRoots": [
         "./@types",
         "./node_modules/@types"
     ],
-    "incremental": true,
-    "skipLibCheck": true
+    "noFallthroughCasesInSwitch": false
   }
 }
