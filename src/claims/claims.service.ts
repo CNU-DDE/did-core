@@ -94,6 +94,7 @@ export class ClaimsService {
                     display_name: issuer.display_name,
                 },
                 title: claim.title,
+                status: claim.status,
             });
         }
         return ret;
