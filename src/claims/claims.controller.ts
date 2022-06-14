@@ -4,6 +4,7 @@ import {
     Body,
     Req,
     Res,
+    Get,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ClaimsService } from './claims.service';
@@ -25,6 +26,34 @@ export class ClaimsController {
         this.claimsService.create(claimsData, req.cookies.access_token)
         .then(() => {
             res.status(201).send({ error: null });
+        })
+        .catch(err => {
+            // Handled error
+            if(err instanceof BaseError) {
+                res.status(err.httpStatusCode).send({ error: err.message });
+
+            // Microservice error
+            } else if(err instanceof AxiosError) {
+                res.status(err.response.status).send(err.response.data);
+
+            // Unhandled error
+            } else {
+                throw new UnhandledError(err);
+            }
+        })
+        .catch(err => {
+            res.status(err.httpStatusCode).send({ error: err.message });
+        });
+    }
+
+    @Get()
+    async getAll(
+        @Req()  req:        Request,
+        @Res()  res:        Response,
+    ) {
+        this.claimsService.getAll(req.cookies.access_token)
+        .then(claims => {
+            res.status(200).send({ error: null, claims, });
         })
         .catch(err => {
             // Handled error
