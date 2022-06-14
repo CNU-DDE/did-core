@@ -12,6 +12,7 @@ import { PostClaimDto } from './dto/post-claim.dto';
 import { BaseError, UnhandledError } from 'src/errors';
 import { AxiosError } from 'axios';
 import { getAPIVersion } from 'src/config/common.config';
+import { StatusCodes as http } from 'http-status-codes';
 
 @Controller(`api/${getAPIVersion()}/claim`)
 export class ClaimsController {
@@ -25,7 +26,7 @@ export class ClaimsController {
     ) {
         this.claimsService.create(claimsData, req.cookies.access_token)
         .then(() => {
-            res.status(201).send({ error: null });
+            res.status(http.CREATED).send({ error: null });
         })
         .catch(err => {
             // Handled error
