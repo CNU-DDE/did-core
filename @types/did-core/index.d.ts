@@ -42,4 +42,12 @@ declare module 'did-core' {
         where:  string;
         what:   string;
     }
+
+    export interface ClaimMinimumInterface {
+        id:         string,
+        issuer?:    { did: did_t, display_name: string },
+        holder?:    { did: did_t, display_name: string },
+        title:      string,
+        status?:    number,
+    }
 }

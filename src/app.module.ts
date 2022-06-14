@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ClaimsModule } from './claims/claims.module';
+import * as mongo from 'src/config/mongodb.config';
 
 @Module({
     imports: [
-        MongooseModule.forRoot('mongodb://didcore:toor@127.0.0.1:27017/didcore'),
+        MongooseModule.forRoot(mongo.getURL()),
         ClaimsModule,
     ],
 })
