@@ -43,11 +43,35 @@ declare module 'did-core' {
         what:   string;
     }
 
+    interface UserMinimumInterface {
+        did:            did_t,
+        display_name:   string,
+    }
+
     export interface ClaimMinimumInterface {
         id:         string,
-        issuer?:    { did: did_t, display_name: string },
-        holder?:    { did: did_t, display_name: string },
+        issuer?:    UserMinimumInterface,
+        holder?:    UserMinimumInterface,
         title:      string,
         status?:    number,
+    }
+
+    interface UserDetailInterface {
+        did:            did_t,
+        display_name:   string,
+        contact:        string,
+        email:          string,
+        address:        string,
+        birth?:         string,
+    }
+
+    export interface ClaimDetailInterface {
+        id:         string,
+        title:      string,
+        claim:      ClaimContentInterface,
+        issuer?:    UserDetailInterface,
+        holder?:    UserDetailInterface,
+        status?:    number,
+        vc?:        string,
     }
 }

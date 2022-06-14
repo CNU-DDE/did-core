@@ -1,5 +1,6 @@
 import {
     Controller,
+    Param,
     Post,
     Body,
     Req,
@@ -54,7 +55,36 @@ export class ClaimsController {
     ) {
         this.claimsService.getAll(req.cookies.access_token)
         .then(claims => {
-            res.status(200).send({ error: null, claims, });
+            res.status(http.OK).send({ error: null, claims, });
+        })
+        .catch(err => {
+            // Handled error
+            if(err instanceof BaseError) {
+                res.status(err.httpStatusCode).send({ error: err.message });
+
+            // Microservice error
+            } else if(err instanceof AxiosError) {
+                res.status(err.response.status).send(err.response.data);
+
+            // Unhandled error
+            } else {
+                throw new UnhandledError(err);
+            }
+        })
+        .catch(err => {
+            res.status(err.httpStatusCode).send({ error: err.message });
+        });
+    }
+
+    @Get('/:id')
+    async getOne(
+        @Req()          req:    Request,
+        @Res()          res:    Response,
+        @Param('id')    id:     string,
+    ) {
+        this.claimsService.getOne(id, req.cookies.access_token)
+        .then(detail => {
+            res.status(http.OK).send({ error: null, detail, });
         })
         .catch(err => {
             // Handled error

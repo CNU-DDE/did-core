@@ -99,4 +99,70 @@ export class ClaimsService {
         }
         return ret;
     }
+
+    /**
+     * Get a claim for user
+     * @param   accessToken:    string
+     */
+    async getOne(
+        claimId:        string,
+        accessToken:    string,
+    ): Promise<dts.ClaimDetailInterface> {
+
+        // Get user info
+        const user = (await sendBroccoliGetRequest("/user/self", accessToken))
+        .data.user_info;
+
+        // For employer
+        if(user.user_type == EMPLOYER_USER_TYPE) {
+
+            // Get claim
+            const claims = await this.claimModel.find({
+                id:     claimId,
+                issuer: user.did,
+                status: 0,
+            });
+
+            // A claim must be searched
+            if(claims.length == 0) {
+                throw new PermissionDeniedError();
+            }
+
+            // Get holder
+            const holder = (await sendBroccoliGetRequest("/user/" + claims[0].owner, accessToken))
+            .data.user_info as dts.UserDetailInterface;
+
+            return {
+                id: claims[0]._id,
+                title: claims[0].title,
+                claim: claims[0].content,
+                holder,
+            };
+        }
+
+        // For employee
+        // Get claim
+        const claims = await this.claimModel.find({
+            id:     claimId,
+            owner:  user.did,
+        });
+
+        // A claim must be searched
+        if(claims.length == 0) {
+            throw new PermissionDeniedError();
+        }
+
+        // Get issuer
+        const issuer = (await sendBroccoliGetRequest("/user/" + claims[0].issuer, accessToken))
+        .data.user_info as dts.UserDetailInterface;
+
+        return {
+            id:     claims[0]._id,
+            title:  claims[0].title,
+            claim:  claims[0].content,
+            status: claims[0].status,
+            vc:     claims[0].vc,
+            issuer,
+        };
+    }
 }
