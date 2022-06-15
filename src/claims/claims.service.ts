@@ -5,7 +5,7 @@ import { Claim } from './schemas/claim.schema';
 import { PostClaimDto } from './dto/post-claim.dto';
 import { sendBroccoliGetRequest } from 'src/httputils';
 import { PermissionDeniedError } from 'src/errors';
-import { EMPLOYER_USER_TYPE, EMPLOYEE_USER_TYPE } from 'src/config/constants';
+import Const from 'src/config/const.config';
 import * as dts from 'did-core';
 
 @Injectable()
@@ -25,7 +25,7 @@ export class ClaimsService {
         const holder = (await sendBroccoliGetRequest("/user/self", accessToken))
         .data.user_info;
 
-        if(holder.user_type != EMPLOYEE_USER_TYPE) {
+        if(holder.user_type != Const.EMPLOYEE_USER_TYPE) {
             throw new PermissionDeniedError()
         }
 
@@ -33,7 +33,7 @@ export class ClaimsService {
         const issuer = (await sendBroccoliGetRequest("/user/" + claimsData.issuer, accessToken))
         .data.user_info;
 
-        if(issuer.user_type != EMPLOYER_USER_TYPE) {
+        if(issuer.user_type != Const.EMPLOYER_USER_TYPE) {
             throw new PermissionDeniedError()
         }
 
@@ -59,7 +59,7 @@ export class ClaimsService {
         .data.user_info;
 
         // For employer
-        if(user.user_type == EMPLOYER_USER_TYPE) {
+        if(user.user_type == Const.EMPLOYER_USER_TYPE) {
             const employersClaim = await this.claimModel.find({
                 issuer: user.did,
                 status: 0,
@@ -114,7 +114,7 @@ export class ClaimsService {
         .data.user_info;
 
         // For employer
-        if(user.user_type == EMPLOYER_USER_TYPE) {
+        if(user.user_type == Const.EMPLOYER_USER_TYPE) {
 
             // Get claim
             const claims = await this.claimModel.find({

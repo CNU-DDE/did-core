@@ -3,8 +3,8 @@ import * as errors from './errors';
 import { EthrDID } from 'ethr-did';
 import { Resolver, DIDDocument } from 'did-resolver'
 import { getResolver } from 'ethr-did-resolver'
-import { DEFAULT_CHAIN } from './config/constants';
-import { getInfuraProjectId } from './config/common.config';
+import Env from './config/env.config';
+import Const from './config/const.config';
 import {
     JwtCredentialPayload,
     JwtPresentationPayload,
@@ -27,7 +27,7 @@ import {
  */
 export function createNewEthDID(): types.DIDInfo {
     const keypair = EthrDID.createKeyPair();
-    const chainNameOrId = DEFAULT_CHAIN;
+    const chainNameOrId = Const.DEFAULT_CHAIN;
     const ethrDid = new EthrDID({...keypair, chainNameOrId});
 
     return {
@@ -45,8 +45,8 @@ export function createNewEthDID(): types.DIDInfo {
  * @return Resolver
  */
 export function getInfuraResolver(chainName?: string): Resolver {
-    const name = chainName || DEFAULT_CHAIN;
-    const rpcUrl = `https://${name}.infura.io/v3/${getInfuraProjectId()}`;
+    const name = chainName || Const.DEFAULT_CHAIN;
+    const rpcUrl = `https://${name}.infura.io/v3/${Env.get('did.infuraPid')}`;
     return new Resolver(getResolver({ name, rpcUrl }));
 }
 
