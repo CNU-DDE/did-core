@@ -4,18 +4,18 @@ import {
     IsNotEmptyObject,
     IsObject,
     ValidateNested,
-    Min,
-    Max,
     IsOptional,
+    IsIn,
 } from 'class-validator'
 import { Type } from 'class-transformer';
 import { KeystoreDto } from './keystore.dto';
+import Const from 'src/config/const.config';
+import { claimStatus_t } from 'did-core';
 
 export class PatchClaimDto {
     @IsInt()
-    @Min(1)
-    @Max(2)
-    status: number;
+    @IsIn([Const.CLAIM_STATUS_ACCEPTED, Const.CLAIM_STATUS_REJECTED])
+    readonly status: claimStatus_t;
 
     @IsOptional()
     @IsDefined()
@@ -23,5 +23,5 @@ export class PatchClaimDto {
     @IsObject()
     @ValidateNested()
     @Type(() => KeystoreDto)
-    keystore: KeystoreDto;
+    readonly keystore: KeystoreDto;
 }

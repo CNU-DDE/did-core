@@ -1,15 +1,16 @@
-import { IsHexString, IsDID } from 'src/validateutils';
+import { IsHexadecimal } from 'class-validator';
+import { IsDID } from 'src/validateutils';
 
 export class KeystoreDto {
     @IsDID()
     readonly did: string;
 
-    @IsHexString()
+    @IsHexadecimal()
     readonly walletAddress: string;
 
-    @IsHexString()
+    @IsHexadecimal()
     readonly privKey: string;
 
-    @IsHexString()
+    @IsHexadecimal()
     readonly pubKey: string;
 }

@@ -1,26 +1,28 @@
 import {
-    IsIn,
-    IsInt,
-    IsHash,
     IsString,
     IsDefined,
-    IsNotEmptyObject,
     IsObject,
+    IsNotEmptyObject,
     ValidateNested,
-    IsOptional,
+    IsInt,
+    IsIn,
+    IsHash,
 } from 'class-validator'
 import { IsDID } from 'src/validateutils';
 import { Type } from 'class-transformer';
 import { did_t } from 'did-core';
 import { ClaimContentDto } from './claim-content.dto';
 import Const from 'src/config/const.config';
-import { claimStatus_t, career_t } from 'did-core';
+import { CLAIM_STATUS_ACCEPTED_LITERAL, CAREER_TYPE_IPFS_HASH_LITERAL } from 'did-core';
 
-export class PostClaimDto {
+export class CreateCareerDto {
 
     // -------------------------
-    // Common requirement
+    // Required fields
     // -------------------------
+    @IsDID()
+    readonly owner: did_t;
+
     @IsDID()
     readonly issuer: did_t;
 
@@ -32,25 +34,20 @@ export class PostClaimDto {
     @IsObject()
     @ValidateNested()
     @Type(() => ClaimContentDto)
-    readonly claim: ClaimContentDto;
-
-    @IsInt()
-    @IsIn([Const.CAREER_TYPE_VC, Const.CAREER_TYPE_IPFS_HASH])
-    readonly careerType: career_t;
+    readonly content: ClaimContentDto;
 
     // -------------------------
-    // Required only for IPFS_HASH type
+    // Enforced fields
     // -------------------------
-    @IsOptional()
     @IsInt()
-    @IsIn([1])
-    readonly status: claimStatus_t;
+    @IsIn([Const.CLAIM_STATUS_ACCEPTED])
+    readonly status: CLAIM_STATUS_ACCEPTED_LITERAL;
 
-    @IsOptional()
-    @IsDID()
-    readonly owner: did_t;
+    @IsInt()
+    @IsIn([Const.CAREER_TYPE_IPFS_HASH])
+    readonly careerType: CAREER_TYPE_IPFS_HASH_LITERAL;
 
-    @IsOptional()
+    @IsString()
     @IsHash("sha256")
     readonly career: string;
 }
