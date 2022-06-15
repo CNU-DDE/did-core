@@ -3,20 +3,18 @@ import {
     IsDefined,
     IsObject,
     IsNotEmptyObject,
-    Contains,
     ValidateNested,
 } from 'class-validator'
+import { IsDID } from 'src/validateutils';
 import { Type } from 'class-transformer';
 import { did_t } from 'did-core';
 import { ClaimContentDto } from './claim-content.dto';
 
 export class CreateClaimDto {
-    @IsString()
-    @Contains('did:')
+    @IsDID()
     owner: did_t;
 
-    @IsString()
-    @Contains('did:')
+    @IsDID()
     issuer: did_t;
 
     @IsString()
