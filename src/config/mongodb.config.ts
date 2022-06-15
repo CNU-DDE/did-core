@@ -1,29 +1,52 @@
+import { validate } from './validation';
+
 export function getHost() {
-    return process.env.MONGODB_HOST;
+    return validate({
+        name:   "MONGODB_HOST",
+        value:  process.env.MONGODB_HOST,
+    });
 }
 
 export function getPort() {
-    return process.env.MONGODB_PORT;
+    return validate({
+        name:   "MONGODB_PORT",
+        value:  process.env.MONGODB_PORT,
+    });
 }
 
 export function getRootUser() {
-    return process.env.MONGODB_ROOT_USER;
+    return validate({
+        name:   "MONGODB_ROOT_USER",
+        value:  process.env.MONGODB_ROOT_USER,
+    });
 }
 
 export function getRootPassword() {
-    return process.env.MONGODB_ROOT_PASSWORD;
+    return validate({
+        name:   "MONGODB_ROOT_PASSWORD",
+        value:  process.env.MONGODB_ROOT_PASSWORD,
+    });
 }
 
 export function getUser() {
-    return process.env.MONGODB_USER;
+    return validate({
+        name:   "MONGODB_USER",
+        value:  process.env.MONGODB_USER,
+    });
 }
 
 export function getPassword() {
-    return process.env.MONGODB_PASSWORD;
+    return validate({
+        name:   "MONGODB_PASSWORD",
+        value:  process.env.MONGODB_PASSWORD,
+    });
 }
 
 export function getDatabase() {
-    return process.env.MONGODB_DATABASE;
+    return validate({
+        name:   "MONGODB_DATABASE",
+        value:  process.env.MONGODB_DATABASE,
+    });
 }
 
 export function getURL() {

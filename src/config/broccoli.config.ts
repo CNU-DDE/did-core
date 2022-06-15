@@ -1,7 +1,15 @@
+import { validate } from './validation';
+
 export function getHost() {
-    return process.env.BROCCOLI_HOST;
+    return validate({
+        name:   "BROCCOLI_HOST",
+        value:  process.env.BROCCOLI_HOST,
+    });
 }
 
 export function getPort() {
-    return process.env.BROCCOLI_PORT;
+    return validate({
+        name:   "BROCCOLI_PORT",
+        value:  process.env.BROCCOLI_PORT
+    });
 }
