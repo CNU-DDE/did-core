@@ -1,43 +1,20 @@
 import {
     IsString,
-    IsDefined,
-    IsObject,
-    IsNotEmptyObject,
-    ValidateNested,
     IsInt,
     IsIn,
     IsHash,
 } from 'class-validator'
-import { IsDID } from 'src/validateutils';
-import { Type } from 'class-transformer';
-import { did_t } from 'did-core';
-import { ClaimContentDto } from './claim-content.dto';
 import Const from 'src/config/const.config';
-import { CLAIM_STATUS_ACCEPTED_LITERAL, CAREER_TYPE_IPFS_HASH_LITERAL } from 'did-core';
+import {
+    career_t,
+    CLAIM_STATUS_ACCEPTED_LITERAL,
+    CAREER_TYPE_IPFS_HASH_LITERAL
+} from 'did-core';
+import {BaseClaimDto, BaseClaimInterface} from './base-claim.dto';
 
-export class CreateCareerDto {
-
+export class CreateCareerDto extends BaseClaimDto implements BaseClaimInterface {
     // -------------------------
-    // Required fields
-    // -------------------------
-    @IsDID()
-    readonly owner: did_t;
-
-    @IsDID()
-    readonly issuer: did_t;
-
-    @IsString()
-    readonly title: string;
-
-    @IsDefined()
-    @IsNotEmptyObject()
-    @IsObject()
-    @ValidateNested()
-    @Type(() => ClaimContentDto)
-    readonly content: ClaimContentDto;
-
-    // -------------------------
-    // Enforced fields
+    // Implemented fields
     // -------------------------
     @IsInt()
     @IsIn([Const.CLAIM_STATUS_ACCEPTED])
@@ -49,5 +26,5 @@ export class CreateCareerDto {
 
     @IsString()
     @IsHash("sha256")
-    readonly career: string;
+    readonly career: career_t;
 }

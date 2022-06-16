@@ -25,7 +25,7 @@ import {
  * @see EthDID class:       https://github.com/uport-project/ethr-did/blob/e76a8e040bb5a1386c9b0488a147717d283b1cea/src/index.ts#L50
  * @return  DIDInfo     Generated DID, wallet address, private key, and public key
  */
-export function createNewEthDID(): types.DIDInfo {
+export function createNewEthDID(): types.KeystoreInterface {
     const keypair = EthrDID.createKeyPair();
     const chainNameOrId = Const.DEFAULT_CHAIN;
     const ethrDid = new EthrDID({...keypair, chainNameOrId});
@@ -83,7 +83,7 @@ export async function resolveDID(did: types.did_t): Promise<DIDDocument> {
  */
 export async function createVC(
     holderDID:      types.did_t,
-    claim:          types.claim_t,
+    claim:          types.ClaimContentInterface,
     issuerDID:      types.did_t,
     issuerPrivkey:  types.privKey_t,
 ): Promise<types.vcJwt_t> {

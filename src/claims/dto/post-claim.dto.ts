@@ -11,10 +11,10 @@ import {
 } from 'class-validator'
 import { IsDID } from 'src/validateutils';
 import { Type } from 'class-transformer';
-import { did_t } from 'did-core';
+import { career_t, CAREER_TYPE_IPFS_HASH_LITERAL, did_t } from 'did-core';
 import { ClaimContentDto } from './claim-content.dto';
 import Const from 'src/config/const.config';
-import { claimStatus_t, career_t } from 'did-core';
+import { careerType_t } from 'did-core';
 
 export class PostClaimDto {
 
@@ -36,15 +36,15 @@ export class PostClaimDto {
 
     @IsInt()
     @IsIn([Const.CAREER_TYPE_VC, Const.CAREER_TYPE_IPFS_HASH])
-    readonly careerType: career_t;
+    readonly careerType: careerType_t;
 
     // -------------------------
     // Required only for IPFS_HASH type
     // -------------------------
     @IsOptional()
     @IsInt()
-    @IsIn([1])
-    readonly status: claimStatus_t;
+    @IsIn([Const.CAREER_TYPE_IPFS_HASH])
+    readonly status: CAREER_TYPE_IPFS_HASH_LITERAL;
 
     @IsOptional()
     @IsDID()
@@ -52,5 +52,5 @@ export class PostClaimDto {
 
     @IsOptional()
     @IsHash("sha256")
-    readonly career: string;
+    readonly career: career_t;
 }

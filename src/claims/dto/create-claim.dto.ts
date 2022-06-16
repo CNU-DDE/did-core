@@ -1,42 +1,18 @@
 import {
-    IsString,
-    IsDefined,
-    IsObject,
-    IsNotEmptyObject,
-    ValidateNested,
     IsInt,
     IsIn,
+    IsEmpty,
 } from 'class-validator'
-import { IsDID } from 'src/validateutils';
-import { Type } from 'class-transformer';
-import { did_t } from 'did-core';
-import { ClaimContentDto } from './claim-content.dto';
-import { CAREER_TYPE_VC_LITERAL } from 'did-core';
+import {
+    CAREER_TYPE_VC_LITERAL,
+} from 'did-core';
 import Const from 'src/config/const.config';
+import { BaseClaimDto, BaseClaimInterface } from './base-claim.dto';
 
-export class CreateClaimDto {
-
-    // -------------------------
-    // Required fields
-    // -------------------------
-    @IsDID()
-    readonly owner: did_t;
-
-    @IsDID()
-    readonly issuer: did_t;
-
-    @IsString()
-    readonly title: string;
-
-    @IsDefined()
-    @IsNotEmptyObject()
-    @IsObject()
-    @ValidateNested()
-    @Type(() => ClaimContentDto)
-    readonly content: ClaimContentDto;
+export class CreateClaimDto extends BaseClaimDto implements BaseClaimInterface {
 
     // -------------------------
-    // Enforced fields
+    // Extended fields
     // -------------------------
     @IsInt()
     @IsIn([Const.CAREER_TYPE_VC])
@@ -45,12 +21,9 @@ export class CreateClaimDto {
     // -------------------------
     // Handled by default
     // -------------------------
+    @IsEmpty()
+    readonly status: undefined;
 
-    // @IsInt()
-    // @IsIn([Const.CLAIM_STATUS_PENDING])
-    // readonly status: CLAIM_STATUS_PENDING_LITERAL;
-
-    // @IsString()
-    // @IsEmpty()
-    // readonly career: "";
+    @IsEmpty()
+    readonly career: undefined;
 }
