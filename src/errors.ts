@@ -48,8 +48,15 @@ export class PermissionDeniedError extends BaseError {
     }
 }
 
+export class NotFoundError extends BaseError {
+    constructor() {
+        super(StatusCodes.NOT_FOUND, 'Content not found');
+    }
+}
+
 export class UnhandledError extends BaseError {
     constructor(err: Error) {
+        console.error(err.stack);
         super(StatusCodes.INTERNAL_SERVER_ERROR, err.message);
     }
 }
