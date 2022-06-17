@@ -6,10 +6,11 @@ import { sendBroccoliGetRequest } from 'src/httputils';
 import { PermissionDeniedError, NotFoundError } from 'src/errors';
 import { createVC } from 'src/did';
 import { encrypt } from 'eciesjs';
-import { CreateClaimDto } from './dto/store/create-claim.dto';
+import { CreateCareerDto, CreateClaimDto } from './dto/store/create-claim.dto';
 import { UpdateClaimToAcceptedDto, UpdateClaimToRejectedDto } from './dto/store/update-claim.dto';
 import Const from 'src/config/const.config';
 import * as dts from 'did-core';
+import {PostCareerDto, PostClaimDto, PostDto} from './dto/http/post-claim.dto';
 
 @Injectable()
 export class ClaimsService {
@@ -18,42 +19,86 @@ export class ClaimsService {
     /**
      * Create claim
      * @param   accessToken:    accessToken_t
-     * @param   issuerDID:      did_t
-     * @param   title:          string
-     * @param   content:        ClaimContentInterface
-     * @param   careerType:     careerType_t
+     * @param   body:           PostDto
      */
     async create(
         accessToken:    dts.accessToken_t,
-        issuerDID:      dts.did_t,
-        title:          string,
-        content:        dts.ClaimContentInterface,
-        careerType:     dts.careerType_t,
+        body:           PostDto
     ) {
-        // Validate holder
-        const holder = (await sendBroccoliGetRequest("/user/self", accessToken))
-        .data.user_info;
+        if (body["claim"]) {
+            const {
+                issuer,
+                title,
+                claim,
+            } = body as PostClaimDto;
 
-        if(holder.user_type != Const.EMPLOYEE_USER_TYPE) {
-            throw new PermissionDeniedError()
+            // Validate holder
+            const holder = (await sendBroccoliGetRequest("/user/self", accessToken))
+            .data.user_info;
+
+            if(holder.user_type != Const.EMPLOYEE_USER_TYPE) {
+                throw new PermissionDeniedError()
+            }
+
+            // Validate issuer
+            const issuerObj = (await sendBroccoliGetRequest("/user/" + issuer, accessToken))
+            .data.user_info;
+
+            if(issuerObj.user_type != Const.EMPLOYER_USER_TYPE) {
+                throw new PermissionDeniedError()
+            }
+
+            // Create claim
+            this.claimModel.create({
+                owner:      holder.did,
+                issuer:     issuerObj.did,
+                title:      title,
+                content:    claim,
+                careerType: Const.CAREER_TYPE_VC,
+            } as CreateClaimDto);
+        } else if (body["career"]) {
+            const {
+                issuer,
+                owner,
+                title,
+                career,
+            } = body as PostCareerDto;
+
+            // Validate employee(owner)
+            const ownerObj = (await sendBroccoliGetRequest("/user/" + owner, accessToken))
+            .data.user_info;
+
+            if(ownerObj.user_type != Const.EMPLOYEE_USER_TYPE) {
+                throw new PermissionDeniedError()
+            }
+
+            // Validate employer(issuer)
+            const issuerObj = (await sendBroccoliGetRequest("/user/" + issuer, accessToken))
+            .data.user_info;
+
+            if(issuerObj.user_type != Const.EMPLOYER_USER_TYPE) {
+                throw new PermissionDeniedError()
+            }
+
+            // TODO: mock data for career content
+            const content = {
+                from: "from",
+                to: "to",
+                where: "where",
+                what: "what",
+            }
+
+            // Create claim
+            this.claimModel.create({
+                owner:      ownerObj.did,
+                issuer:     issuerObj.did,
+                title:      title,
+                careerType: Const.CAREER_TYPE_IPFS_HASH,
+                status:     Const.CLAIM_STATUS_ACCEPTED,
+                content,
+                career,
+            } as CreateCareerDto);
         }
-
-        // Validate issuer
-        const issuer = (await sendBroccoliGetRequest("/user/" + issuerDID, accessToken))
-        .data.user_info;
-
-        if(issuer.user_type != Const.EMPLOYER_USER_TYPE) {
-            throw new PermissionDeniedError()
-        }
-
-        // Create claim
-        this.claimModel.create({
-            owner:      holder.did,
-            issuer:     issuer.did,
-            title:      title,
-            content:    content,
-            careerType: careerType,
-        } as CreateClaimDto);
     }
 
     /**
