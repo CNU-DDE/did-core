@@ -247,16 +247,9 @@ export class ClaimsService {
         }
 
         // Create VC
-        // Delete "_id" field
-        const claimContent = JSON.parse(
-            JSON.stringify(claim.content),
-        ) as dts.ClaimContentInterface&{_id:any}; // Deep copy
-        delete claimContent._id;
-
-        // Gen VC
         const vc = Buffer.from(await createVC(
             claim.owner,        // Holder DID
-            claimContent,       // Claim
+            claim.content,       // Claim
             issuer.did,         // Issuer DID
             keystore.privKey,   // Issuer private key
         ));
