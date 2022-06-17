@@ -64,11 +64,10 @@ export class ResumesService {
         .filter(career => career.careerType == Const.CAREER_TYPE_IPFS_HASH)
         .map(career => career.content);
 
+        const vp = vcs.length == 0 ? "" : await createVP(holderObj.did, keystore.privKey, vcs);
+
         // Get VP and SmartCareers
-        const careers = {
-            vp: await createVP(holderObj.did, keystore.privKey, vcs),
-            smartCareers,
-        };
+        const careers = { vp, smartCareers };
 
         // Create claim
         this.resumeModel.create({

@@ -25,7 +25,7 @@ export class CareerEntryDto {
     content:    career_t;
 }
 
-export class CreateResumeDto {
+export class PostResumeDto {
     @IsDefined()
     @IsNotEmptyObject()
     @IsObject()
