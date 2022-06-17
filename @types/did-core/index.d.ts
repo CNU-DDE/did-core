@@ -18,6 +18,8 @@ declare module 'did-core' {
     export type ipfsHash_t      = string;
     export type encVc_t         = string;
     export type career_t        = encVc_t|ipfsHash_t;
+    // Resume
+    export type position_t      = number;
 
     // -------------------------
     // Literal types
@@ -93,5 +95,11 @@ declare module 'did-core' {
         status?:    number,
         careerType?:number,
         career?:    vcJwt_t|ipfsHash_t,
+    }
+
+    // Resume
+    export interface ResumeCareersInterface {
+        vp:             vpJwt_t,
+        smartCareers:   ipfsHash_t[],
     }
 }
