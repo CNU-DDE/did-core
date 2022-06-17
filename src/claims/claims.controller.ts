@@ -10,9 +10,9 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ClaimsService } from './claims.service';
-import { PostClaimDto } from './dto/http/post-claim.dto';
+import { PostDto } from './dto/http/post-claim.dto';
 import { PatchClaimDto } from './dto/http/patch-claim.dto';
-import { BaseError, UnhandledError } from 'src/errors';
+import { BaseError, UnhandledError } from 'src/domain/errors.domain';
 import { AxiosError } from 'axios';
 import { StatusCodes as http } from 'http-status-codes';
 import Const from 'src/config/const.config';
@@ -25,14 +25,11 @@ export class ClaimsController {
     async create(
         @Req()  req:        Request,
         @Res()  res:        Response,
-        @Body() claimsData: PostClaimDto,
+        @Body() claimsData: PostDto,
     ) {
         this.claimsService.create(
             req.cookies.access_token,
-            claimsData.issuer,
-            claimsData.title,
-            claimsData.claim,
-            claimsData.careerType,
+            claimsData,
         ).then(() => {
             res.status(http.CREATED).send({ error: null });
         }).catch(err => {

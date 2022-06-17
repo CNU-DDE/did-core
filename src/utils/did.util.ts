@@ -1,10 +1,10 @@
 import * as types from 'did-core';
-import * as errors from './errors';
+import * as errors from 'src/domain/errors.domain';
 import { EthrDID } from 'ethr-did';
 import { Resolver, DIDDocument } from 'did-resolver'
 import { getResolver } from 'ethr-did-resolver'
-import Env from './config/env.config';
-import Const from './config/const.config';
+import Env from '../config/env.config';
+import Const from '../config/const.config';
 import {
     JwtCredentialPayload,
     JwtPresentationPayload,

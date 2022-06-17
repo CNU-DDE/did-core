@@ -1,21 +1,20 @@
 import {
-    IsInt,
     IsDefined,
     IsNotEmptyObject,
     IsObject,
     ValidateNested,
     IsOptional,
     IsIn,
+    IsEnum,
 } from 'class-validator'
 import { Type } from 'class-transformer';
 import { KeystoreDto } from '../nested/keystore.dto';
-import Const from 'src/config/const.config';
-import { claimStatus_t } from 'did-core';
+import {ClaimStatus} from 'src/domain/enums.domain';
 
 export class PatchClaimDto {
-    @IsInt()
-    @IsIn([Const.CLAIM_STATUS_ACCEPTED, Const.CLAIM_STATUS_REJECTED])
-    readonly status: claimStatus_t;
+    @IsEnum(ClaimStatus)
+    @IsIn([ClaimStatus.ACCEPTED, ClaimStatus.REJECTED])
+    readonly status: ClaimStatus.ACCEPTED|ClaimStatus.REJECTED;
 
     @IsOptional()
     @IsDefined()

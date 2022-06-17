@@ -1,5 +1,5 @@
 import { IsHexadecimal } from 'class-validator';
-import { IsDID } from 'src/validateutils';
+import { IsDID } from 'src/utils/validation.util';
 import { did_t, address_t, pubKey_t, privKey_t } from 'did-core';
 
 export class KeystoreDto {

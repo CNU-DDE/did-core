@@ -2,14 +2,15 @@ import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Claim } from './schemas/claim.schema';
-import { sendBroccoliGetRequest } from 'src/httputils';
-import { PermissionDeniedError, NotFoundError } from 'src/errors';
-import { createVC } from 'src/did';
+import { sendBroccoliGetRequest } from 'src/utils/http.util';
+import { PermissionDeniedError, NotFoundError } from 'src/domain/errors.domain';
+import { UserType, ClaimStatus, CareerType } from 'src/domain/enums.domain';
+import { createVC } from 'src/utils/did.util';
 import { encrypt } from 'eciesjs';
-import { CreateClaimDto } from './dto/store/create-claim.dto';
+import { CreateCareerDto, CreateClaimDto } from './dto/store/create-claim.dto';
 import { UpdateClaimToAcceptedDto, UpdateClaimToRejectedDto } from './dto/store/update-claim.dto';
-import Const from 'src/config/const.config';
 import * as dts from 'did-core';
+import {PostCareerDto, PostClaimDto, PostDto} from './dto/http/post-claim.dto';
 
 @Injectable()
 export class ClaimsService {
@@ -18,42 +19,86 @@ export class ClaimsService {
     /**
      * Create claim
      * @param   accessToken:    accessToken_t
-     * @param   issuerDID:      did_t
-     * @param   title:          string
-     * @param   content:        ClaimContentInterface
-     * @param   careerType:     careerType_t
+     * @param   body:           PostDto
      */
     async create(
         accessToken:    dts.accessToken_t,
-        issuerDID:      dts.did_t,
-        title:          string,
-        content:        dts.ClaimContentInterface,
-        careerType:     dts.careerType_t,
+        body:           PostDto
     ) {
-        // Validate holder
-        const holder = (await sendBroccoliGetRequest("/user/self", accessToken))
-        .data.user_info;
+        if (body["claim"]) {
+            const {
+                issuer,
+                title,
+                claim,
+            } = body as PostClaimDto;
 
-        if(holder.user_type != Const.EMPLOYEE_USER_TYPE) {
-            throw new PermissionDeniedError()
+            // Validate holder
+            const holder = (await sendBroccoliGetRequest("/user/self", accessToken))
+            .data.user_info;
+
+            if(holder.user_type != UserType.EMPLOYEE) {
+                throw new PermissionDeniedError()
+            }
+
+            // Validate issuer
+            const issuerObj = (await sendBroccoliGetRequest("/user/" + issuer, accessToken))
+            .data.user_info;
+
+            if(issuerObj.user_type != UserType.EMPLOYER) {
+                throw new PermissionDeniedError()
+            }
+
+            // Create claim
+            this.claimModel.create({
+                owner:      holder.did,
+                issuer:     issuerObj.did,
+                title:      title,
+                content:    claim,
+                careerType: CareerType.ENC_VC,
+            } as CreateClaimDto);
+        } else if (body["career"]) {
+            const {
+                issuer,
+                owner,
+                title,
+                career,
+            } = body as PostCareerDto;
+
+            // Validate employee(owner)
+            const ownerObj = (await sendBroccoliGetRequest("/user/" + owner, accessToken))
+            .data.user_info;
+
+            if(ownerObj.user_type != UserType.EMPLOYEE) {
+                throw new PermissionDeniedError()
+            }
+
+            // Validate employer(issuer)
+            const issuerObj = (await sendBroccoliGetRequest("/user/" + issuer, accessToken))
+            .data.user_info;
+
+            if(issuerObj.user_type != UserType.EMPLOYER) {
+                throw new PermissionDeniedError()
+            }
+
+            // TODO: mock data for career content
+            const content = {
+                from: "from",
+                to: "to",
+                where: "where",
+                what: "what",
+            }
+
+            // Create claim
+            this.claimModel.create({
+                owner:      ownerObj.did,
+                issuer:     issuerObj.did,
+                title:      title,
+                careerType: CareerType.IPFS_HASH,
+                status:     ClaimStatus.ACCEPTED,
+                content,
+                career,
+            } as CreateCareerDto);
         }
-
-        // Validate issuer
-        const issuer = (await sendBroccoliGetRequest("/user/" + issuerDID, accessToken))
-        .data.user_info;
-
-        if(issuer.user_type != Const.EMPLOYER_USER_TYPE) {
-            throw new PermissionDeniedError()
-        }
-
-        // Create claim
-        this.claimModel.create({
-            owner:      holder.did,
-            issuer:     issuer.did,
-            title:      title,
-            content:    content,
-            careerType: careerType,
-        } as CreateClaimDto);
     }
 
     /**
@@ -69,45 +114,30 @@ export class ClaimsService {
         .data.user_info;
 
         // For employer
-        if(user.user_type == Const.EMPLOYER_USER_TYPE) {
-            const employersClaim = await this.claimModel.find({
+        if(user.user_type == UserType.EMPLOYER) {
+            const claims = await this.claimModel.find({
                 issuer: user.did,
                 status: 0,
             }).exec();
 
-            return employersClaim.map((claim) => ({
-                id: claim._id,
-                holder: {
-                    did: user.did,
-                    display_name: user.display_name,
-                },
-                title: claim.title,
+            return claims.map((claim) => ({
+                id:     claim._id,
+                holder: claim.owner,
+                title:  claim.title,
             }));
         }
 
         // For employee
-        const employeesClaim = await this.claimModel.find({
+        const claims = await this.claimModel.find({
             owner: user.did,
         }).exec();
 
-        const ret = [];
-        for(const claim of employeesClaim) {
-
-            // Get issuer info
-            const issuer = (await sendBroccoliGetRequest("/user/" + claim.issuer, accessToken))
-            .data.user_info;
-
-            ret.push({
-                id: claim._id,
-                issuer: {
-                    did: issuer.did,
-                    display_name: issuer.display_name,
-                },
-                title: claim.title,
-                status: claim.status,
-            });
-        }
-        return ret;
+        return claims.map((claim) => ({
+            id:     claim._id,
+            issuer: claim.issuer,
+            title:  claim.title,
+            status: claim.status,
+        }));
     }
 
     /**
@@ -124,65 +154,43 @@ export class ClaimsService {
         const user = (await sendBroccoliGetRequest("/user/self", accessToken))
         .data.user_info;
 
-        // For employer
-        if(user.user_type == Const.EMPLOYER_USER_TYPE) {
-
-            // Get claim
-            let claim = {} as Claim;
-            try {
-                claim = await this.claimModel.findOne({
-                    _id:     claimId,
-                    issuer: user.did,
-                    status: 0,
-                }).exec();
-            } catch {
-                throw new NotFoundError();
-            }
-
-            if (!claim) {
-                throw new NotFoundError();
-            }
-
-            // Get holder
-            const holder = (await sendBroccoliGetRequest("/user/" + claim.owner, accessToken))
-            .data.user_info as dts.UserDetailInterface;
-
-            return {
-                id: claim._id,
-                title: claim.title,
-                claim: claim.content,
-                holder,
-            };
-        }
-
-        // For employee
         // Get claim
-        let claim = {} as Claim;
-        try {
-            claim = await this.claimModel.findOne({
-                _id:     claimId,
-                owner:  user.did,
-            }).exec();
-        } catch {
-            throw new NotFoundError();
-        }
+        const claim = await this.claimModel.findOne({ _id: claimId })
+        .exec()
+        .catch(() => null);
 
         if (!claim) {
             throw new NotFoundError();
         }
 
-        // Get issuer
-        const issuer = (await sendBroccoliGetRequest("/user/" + claim.issuer, accessToken))
-        .data.user_info as dts.UserDetailInterface;
+        // For employer
+        if(user.user_type == UserType.EMPLOYER) {
+
+            if (claim.issuer != user.did) {
+                throw new PermissionDeniedError();
+            }
+
+            return {
+                id:     claim._id,
+                holder: claim.owner,
+                title:  claim.title,
+                claim:  claim.content,
+            };
+        }
+
+        // For employee
+        if (claim.owner != user.did) {
+            throw new PermissionDeniedError();
+        }
 
         return {
             id:         claim._id,
+            issuer:     claim.issuer,
             title:      claim.title,
             claim:      claim.content,
             status:     claim.status,
             careerType: claim.careerType,
             career:     claim.career,
-            issuer,
         };
     }
 
@@ -195,7 +203,7 @@ export class ClaimsService {
      */
     async updateVC(
         claimId:        dts.mongoId_t,
-        status:         dts.claimStatus_t,
+        status:         ClaimStatus,
         keystore:       dts.KeystoreInterface,
         accessToken:    dts.accessToken_t,
     ) {
@@ -204,7 +212,7 @@ export class ClaimsService {
         .data.user_info;
 
         // Issuer must be employer
-        if (issuer.user_type != Const.EMPLOYER_USER_TYPE) {
+        if (issuer.user_type != UserType.EMPLOYER) {
             throw new PermissionDeniedError()
         }
 
@@ -212,20 +220,22 @@ export class ClaimsService {
         const claim = await this.claimModel.findOne({
             _id:         claimId,
             issuer:     issuer.did,
-            status:     Const.CLAIM_STATUS_PENDING,
-            careerType: Const.CAREER_TYPE_VC,
-        }).exec();
+            status:     ClaimStatus.PENDING,
+            careerType: CareerType.ENC_VC,
+        })
+        .exec()
+        .catch(() => null);
 
         if (!claim) {
             throw new NotFoundError();
         }
 
         // For CLAIM_STATUS_REJECTED
-        if (status == Const.CLAIM_STATUS_REJECTED) {
+        if (status == ClaimStatus.REJECTED) {
 
             // Update status and return
             await this.claimModel.findByIdAndUpdate({ _id: claimId }, {
-                status: Const.CLAIM_STATUS_REJECTED,
+                status: ClaimStatus.REJECTED,
             } as UpdateClaimToRejectedDto);
             return;
         }
@@ -237,16 +247,9 @@ export class ClaimsService {
         }
 
         // Create VC
-        // Delete "_id" field
-        const claimContent = JSON.parse(
-            JSON.stringify(claim.content),
-        ) as dts.ClaimContentInterface&{_id:any}; // Deep copy
-        delete claimContent._id;
-
-        // Gen VC
         const vc = Buffer.from(await createVC(
             claim.owner,        // Holder DID
-            claimContent,       // Claim
+            claim.content,       // Claim
             issuer.did,         // Issuer DID
             keystore.privKey,   // Issuer private key
         ));
@@ -256,7 +259,7 @@ export class ClaimsService {
 
         // Update claim
         await this.claimModel.findByIdAndUpdate({ _id: claimId }, {
-            status: Const.CLAIM_STATUS_ACCEPTED,
+            status: ClaimStatus.ACCEPTED,
             career: encrypt(holderPub, vc).toString("base64"),
         } as UpdateClaimToAcceptedDto);
     }

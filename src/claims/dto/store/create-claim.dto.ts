@@ -1,17 +1,12 @@
 import {
-    IsInt,
     IsIn,
     IsEmpty,
     IsString,
     IsHash,
+    IsEnum,
 } from 'class-validator'
-import {
-    career_t,
-    CLAIM_STATUS_ACCEPTED_LITERAL,
-    CAREER_TYPE_IPFS_HASH_LITERAL,
-    CAREER_TYPE_VC_LITERAL,
-} from 'did-core';
-import Const from 'src/config/const.config';
+import { career_t } from 'did-core';
+import { CareerType, ClaimStatus } from 'src/domain/enums.domain';
 import { BaseClaimDto, BaseClaimInterface } from './base-claim.dto';
 
 export class CreateClaimDto extends BaseClaimDto implements BaseClaimInterface {
@@ -19,9 +14,9 @@ export class CreateClaimDto extends BaseClaimDto implements BaseClaimInterface {
     // -------------------------
     // Extended fields
     // -------------------------
-    @IsInt()
-    @IsIn([Const.CAREER_TYPE_VC])
-    readonly careerType: CAREER_TYPE_VC_LITERAL;
+    @IsEnum(CareerType)
+    @IsIn([CareerType.ENC_VC])
+    readonly careerType: CareerType.ENC_VC;
 
     // -------------------------
     // Handled by default
@@ -37,13 +32,13 @@ export class CreateCareerDto extends BaseClaimDto implements BaseClaimInterface 
     // -------------------------
     // Implemented fields
     // -------------------------
-    @IsInt()
-    @IsIn([Const.CLAIM_STATUS_ACCEPTED])
-    readonly status: CLAIM_STATUS_ACCEPTED_LITERAL;
+    @IsEnum(ClaimStatus)
+    @IsIn([ClaimStatus.ACCEPTED])
+    readonly status: ClaimStatus.ACCEPTED;
 
-    @IsInt()
-    @IsIn([Const.CAREER_TYPE_IPFS_HASH])
-    readonly careerType: CAREER_TYPE_IPFS_HASH_LITERAL;
+    @IsEnum(CareerType)
+    @IsIn([CareerType.IPFS_HASH])
+    readonly careerType: CareerType.IPFS_HASH;
 
     @IsString()
     @IsHash("sha256")

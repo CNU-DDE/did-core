@@ -5,10 +5,11 @@ import {
     IsNotEmptyObject,
     ValidateNested,
 } from 'class-validator'
-import { IsDID } from 'src/validateutils';
+import { IsDID } from 'src/utils/validation.util';
 import { Type } from 'class-transformer';
-import { did_t, claimStatus_t, careerType_t, career_t } from 'did-core';
+import { did_t, career_t } from 'did-core';
 import { ClaimContentDto } from '../nested/claim-content.dto';
+import { ClaimStatus, CareerType } from 'src/domain/enums.domain';
 
 export class BaseClaimDto {
     // -------------------------
@@ -35,7 +36,7 @@ export interface BaseClaimInterface {
     // -------------------------
     // Validate enforced fields
     // -------------------------
-    readonly status:        claimStatus_t;
-    readonly careerType:    careerType_t;
+    readonly status:        ClaimStatus;
+    readonly careerType:    CareerType;
     readonly career:        career_t;
 }
