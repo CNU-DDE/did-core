@@ -54,6 +54,12 @@ export class NotFoundError extends BaseError {
     }
 }
 
+export class ClientFaultError extends BaseError {
+    constructor() {
+        super(StatusCodes.BAD_REQUEST, 'Bad request');
+    }
+}
+
 export class UnhandledError extends BaseError {
     constructor(err: Error) {
         console.error(err.stack);

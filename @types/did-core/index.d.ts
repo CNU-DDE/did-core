@@ -19,7 +19,9 @@ declare module 'did-core' {
     export type encVc_t         = string;
     export type career_t        = encVc_t|ipfsHash_t;
     // Resume
-    export type position_t      = number;
+    export type mariaId_t       = number;
+    export type positionId_t    = mariaId_t;
+    export type coverLetterId_t = mariaId_t;
 
     // -------------------------
     // Literal types
