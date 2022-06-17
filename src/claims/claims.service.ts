@@ -128,11 +128,16 @@ export class ClaimsService {
         if(user.user_type == Const.EMPLOYER_USER_TYPE) {
 
             // Get claim
-            const claim = await this.claimModel.findOne({
-                id:     claimId,
-                issuer: user.did,
-                status: 0,
-            }).exec();
+            let claim = {} as Claim;
+            try {
+                claim = await this.claimModel.findOne({
+                    _id:     claimId,
+                    issuer: user.did,
+                    status: 0,
+                }).exec();
+            } catch {
+                throw new NotFoundError();
+            }
 
             if (!claim) {
                 throw new NotFoundError();
@@ -152,10 +157,15 @@ export class ClaimsService {
 
         // For employee
         // Get claim
-        const claim = await this.claimModel.findOne({
-            id:     claimId,
-            owner:  user.did,
-        }).exec();
+        let claim = {} as Claim;
+        try {
+            claim = await this.claimModel.findOne({
+                _id:     claimId,
+                owner:  user.did,
+            }).exec();
+        } catch {
+            throw new NotFoundError();
+        }
 
         if (!claim) {
             throw new NotFoundError();
@@ -200,7 +210,7 @@ export class ClaimsService {
 
         // Select a claim
         const claim = await this.claimModel.findOne({
-            id:         claimId,
+            _id:         claimId,
             issuer:     issuer.did,
             status:     Const.CLAIM_STATUS_PENDING,
             careerType: Const.CAREER_TYPE_VC,
