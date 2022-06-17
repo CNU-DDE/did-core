@@ -1,8 +1,11 @@
+import {
+    sendBroccoliGetRequest,
+    sendIPFSGetRequest,
+} from 'src/utils/http.util';
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Claim } from './schemas/claim.schema';
-import { sendBroccoliGetRequest } from 'src/utils/http.util';
 import { PermissionDeniedError, NotFoundError } from 'src/domain/errors.domain';
 import { UserType, ClaimStatus, CareerType } from 'src/domain/enums.domain';
 import { createVC } from 'src/utils/did.util';
@@ -80,14 +83,6 @@ export class ClaimsService {
                 throw new PermissionDeniedError()
             }
 
-            // TODO: mock data for career content
-            const content = {
-                from: "from",
-                to: "to",
-                where: "where",
-                what: "what",
-            }
-
             // Create claim
             this.claimModel.create({
                 owner:      ownerObj.did,
@@ -95,7 +90,7 @@ export class ClaimsService {
                 title:      title,
                 careerType: CareerType.IPFS_HASH,
                 status:     ClaimStatus.ACCEPTED,
-                content,
+                content:    (await sendIPFSGetRequest(career)).data.content,
                 career,
             } as CreateCareerDto);
         }

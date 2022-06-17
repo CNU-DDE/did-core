@@ -18,6 +18,10 @@ export default class Env {
             password:       "MONGODB_PASSWORD",
             database:       "MONGODB_DATABASE",
         },
+
+        ipfs: {
+            urlPrefix:      "IPFS_URL_PREFIX",
+        },
     };
 
     public static get(path: string): string {

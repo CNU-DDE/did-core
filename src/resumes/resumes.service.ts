@@ -1,13 +1,20 @@
+import {
+    PermissionDeniedError,
+    ClientFaultError,
+    NotFoundError,
+} from 'src/domain/errors.domain';
+import {
+    sendBroccoliGetRequest,
+    sendIPFSGetRequest,
+} from 'src/utils/http.util';
 import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { sendBroccoliGetRequest } from 'src/utils/http.util';
-import { PermissionDeniedError, ClientFaultError } from 'src/domain/errors.domain';
 import { Resume } from './schema/resume.schema';
 import { CreateResumeDto } from './dto/create-resume.dto';
 import { CareerEntryDto } from './dto/post-resume.dto';
-import { createVP } from 'src/utils/did.util';
-import {CareerType, UserType} from 'src/domain/enums.domain';
+import { createVP, verifyVP } from 'src/utils/did.util';
+import { CareerType, UserType } from 'src/domain/enums.domain';
 import * as dts from 'did-core';
 
 @Injectable()
@@ -15,7 +22,7 @@ export class ResumesService {
     constructor(@InjectModel(Resume.name) private resumeModel: Model<Resume>) {}
 
     /**
-     * Create claim
+     * Create resume
      * @param   accessToken:    accessToken_t
      * @param   keystore:       KeystoreInterface
      * @param   verifier:       did_t
@@ -78,5 +85,139 @@ export class ResumesService {
             coverLetterIds,
             careers,
         } as CreateResumeDto);
+    }
+
+    /**
+     * Get all resume for user
+     * @param   accessToken:    accessToken_t
+     * @param   positionId:     mariaId_t
+     */
+    async getAll(
+        accessToken:    dts.accessToken_t,
+        positionId:     dts.mariaId_t|undefined,
+    ): Promise<dts.ResumeMinimumInterface[]> {
+
+        // Get user info
+        const user = (await sendBroccoliGetRequest("/user/self", accessToken))
+        .data.user_info;
+
+        // Position ID specified
+        if (positionId) {
+            // Only an employer can query with positionId
+            if(user.user_type != UserType.EMPLOYER) {
+                throw new PermissionDeniedError();
+            }
+
+            // Get resumes
+            const resumes = await this.resumeModel.find({
+                positionId,
+                verifier: user.did,
+            }).exec()
+
+            // Serialize
+            return resumes.map(resume => ({
+                id:         resume._id,
+                title:      resume.title,
+                holder:     resume.owner,
+            }));
+        }
+
+        // For employer
+        if(user.user_type == UserType.EMPLOYER) {
+            // Get resumes
+            const resumes = await this.resumeModel.find({
+                verifier: user.did,
+            }).exec();
+
+            // Serialize
+            return resumes.map(resume => ({
+                id:     resume._id,
+                title:  resume.title,
+                holder: resume.owner,
+            }));
+        }
+
+        // For employee
+        const resumes = await this.resumeModel.find({
+            owner:  user.did,
+        }).exec();
+
+        return resumes.map(resume => ({
+            id:         resume._id,
+            title:      resume.title,
+            verifier:   resume.verifier,
+        }));
+    }
+
+    /**
+     * Get a resume for an user
+     * @param   resumeId:       mongoId_t
+     * @param   accessToken:    accessToken_t
+     */
+    async getOne(
+        resumeId:       dts.mongoId_t,
+        accessToken:    dts.accessToken_t,
+    ): Promise<dts.ResumeDetailInterface> {
+
+        // Get user info
+        const user = (await sendBroccoliGetRequest("/user/self", accessToken))
+        .data.user_info;
+
+        // Get a resume
+        const resume = await this.resumeModel.findOne({ _id: resumeId })
+        .exec()
+        .catch(() => null);
+
+        if (!resume) {
+            throw new NotFoundError();
+        }
+
+        // Permission check
+        if  ((user.user_type == UserType.EMPLOYER && resume.verifier != user.did) ||
+            (user.user_type == UserType.EMPLOYEE && resume.owner != user.did)) {
+            throw new PermissionDeniedError();
+        }
+
+        // Get VC
+        const vcs = (await verifyVP(resume.careers.vp))
+        .verifiablePresentation
+        .verifiableCredential;
+
+        // Serialize VCs
+        const careers = vcs.map(vc => ({
+            holder: vc.credentialSubject.id,
+            issuer: vc.issuer.id,
+            content: {
+                from: vc.credentialSubject.from,
+                to: vc.credentialSubject.to,
+                where: vc.credentialSubject.where,
+                what: vc.credentialSubject.what,
+            },
+            verify: vc.proof as dts.JWTProof,
+            isVerified: true,
+        } as dts.ResumeCareerEntryInterface));
+
+        // Serialize SmartCareers
+        for(const sc of resume.careers.smartCareers) {
+            const career = (await sendIPFSGetRequest(sc)).data;
+            careers.push({
+                holder:     career.holder,
+                issuer:     career.issuer,
+                content:    career.content,
+                verify:     { type: "IPFS_HASH", hash: sc },
+                isVerified: true,
+            } as dts.ResumeCareerEntryInterface);
+        }
+
+        // Serialize
+        return {
+            id:             resume._id,
+            owner:          resume.owner,
+            verifier:       resume.verifier,
+            title:          resume.title,
+            positionId:     resume.positionId,
+            coverLetterId:  resume.coverLetterIds,
+            careers,
+        };
     }
 }
