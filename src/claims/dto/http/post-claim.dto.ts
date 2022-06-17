@@ -12,7 +12,7 @@ import {
 import { IsDID } from 'src/validateutils';
 import { Type } from 'class-transformer';
 import { career_t, CAREER_TYPE_IPFS_HASH_LITERAL, did_t } from 'did-core';
-import { ClaimContentDto } from './claim-content.dto';
+import { ClaimContentDto } from '../nested/claim-content.dto';
 import Const from 'src/config/const.config';
 import { careerType_t } from 'did-core';
 

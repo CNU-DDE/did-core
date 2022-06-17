@@ -8,7 +8,7 @@ import {
     IsIn,
 } from 'class-validator'
 import { Type } from 'class-transformer';
-import { KeystoreDto } from './keystore.dto';
+import { KeystoreDto } from '../nested/keystore.dto';
 import Const from 'src/config/const.config';
 import { claimStatus_t } from 'did-core';
 

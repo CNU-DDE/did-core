@@ -10,8 +10,8 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ClaimsService } from './claims.service';
-import { PostClaimDto } from './dto/post-claim.dto';
-import { PatchClaimDto } from './dto/patch-claim.dto';
+import { PostClaimDto } from './dto/http/post-claim.dto';
+import { PatchClaimDto } from './dto/http/patch-claim.dto';
 import { BaseError, UnhandledError } from 'src/errors';
 import { AxiosError } from 'axios';
 import { StatusCodes as http } from 'http-status-codes';

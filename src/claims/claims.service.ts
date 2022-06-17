@@ -2,12 +2,12 @@ import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Claim } from './schemas/claim.schema';
-import { PostClaimDto } from './dto/post-claim.dto';
 import { sendBroccoliGetRequest } from 'src/httputils';
 import { PermissionDeniedError, NotFoundError } from 'src/errors';
 import { createVC } from 'src/did';
 import { encrypt } from 'eciesjs';
-import { UpdateClaimToAcceptedDto, UpdateClaimToRejectedDto } from './dto/update-claim.dto';
+import { CreateClaimDto } from './dto/store/create-claim.dto';
+import { UpdateClaimToAcceptedDto, UpdateClaimToRejectedDto } from './dto/store/update-claim.dto';
 import Const from 'src/config/const.config';
 import * as dts from 'did-core';
 
