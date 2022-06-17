@@ -128,6 +128,10 @@ export class ClaimsService {
                 status: 0,
             }).exec();
 
+            if (!claim) {
+                throw new NotFoundError();
+            }
+
             // Get holder
             const holder = (await sendBroccoliGetRequest("/user/" + claim.owner, accessToken))
             .data.user_info as dts.UserDetailInterface;
@@ -146,6 +150,10 @@ export class ClaimsService {
             id:     claimId,
             owner:  user.did,
         }).exec();
+
+        if (!claim) {
+            throw new NotFoundError();
+        }
 
         // Get issuer
         const issuer = (await sendBroccoliGetRequest("/user/" + claim.issuer, accessToken))
