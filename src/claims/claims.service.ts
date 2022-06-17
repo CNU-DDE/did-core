@@ -70,44 +70,29 @@ export class ClaimsService {
 
         // For employer
         if(user.user_type == Const.EMPLOYER_USER_TYPE) {
-            const employersClaim = await this.claimModel.find({
+            const claims = await this.claimModel.find({
                 issuer: user.did,
                 status: 0,
             }).exec();
 
-            return employersClaim.map((claim) => ({
-                id: claim._id,
-                holder: {
-                    did: user.did,
-                    display_name: user.display_name,
-                },
-                title: claim.title,
+            return claims.map((claim) => ({
+                id:     claim._id,
+                holder: claim.owner,
+                title:  claim.title,
             }));
         }
 
         // For employee
-        const employeesClaim = await this.claimModel.find({
+        const claims = await this.claimModel.find({
             owner: user.did,
         }).exec();
 
-        const ret = [];
-        for(const claim of employeesClaim) {
-
-            // Get issuer info
-            const issuer = (await sendBroccoliGetRequest("/user/" + claim.issuer, accessToken))
-            .data.user_info;
-
-            ret.push({
-                id: claim._id,
-                issuer: {
-                    did: issuer.did,
-                    display_name: issuer.display_name,
-                },
-                title: claim.title,
-                status: claim.status,
-            });
-        }
-        return ret;
+        return claims.map((claim) => ({
+            id:     claim._id,
+            issuer: claim.issuer,
+            title:  claim.title,
+            status: claim.status,
+        }));
     }
 
     /**
@@ -124,65 +109,43 @@ export class ClaimsService {
         const user = (await sendBroccoliGetRequest("/user/self", accessToken))
         .data.user_info;
 
-        // For employer
-        if(user.user_type == Const.EMPLOYER_USER_TYPE) {
-
-            // Get claim
-            let claim = {} as Claim;
-            try {
-                claim = await this.claimModel.findOne({
-                    _id:     claimId,
-                    issuer: user.did,
-                    status: 0,
-                }).exec();
-            } catch {
-                throw new NotFoundError();
-            }
-
-            if (!claim) {
-                throw new NotFoundError();
-            }
-
-            // Get holder
-            const holder = (await sendBroccoliGetRequest("/user/" + claim.owner, accessToken))
-            .data.user_info as dts.UserDetailInterface;
-
-            return {
-                id: claim._id,
-                title: claim.title,
-                claim: claim.content,
-                holder,
-            };
-        }
-
-        // For employee
         // Get claim
-        let claim = {} as Claim;
-        try {
-            claim = await this.claimModel.findOne({
-                _id:     claimId,
-                owner:  user.did,
-            }).exec();
-        } catch {
-            throw new NotFoundError();
-        }
+        const claim = await this.claimModel.findOne({ _id: claimId })
+        .exec()
+        .catch(() => null);
 
         if (!claim) {
             throw new NotFoundError();
         }
 
-        // Get issuer
-        const issuer = (await sendBroccoliGetRequest("/user/" + claim.issuer, accessToken))
-        .data.user_info as dts.UserDetailInterface;
+        // For employer
+        if(user.user_type == Const.EMPLOYER_USER_TYPE) {
+
+            if (claim.issuer != user.did) {
+                throw new PermissionDeniedError();
+            }
+
+            return {
+                id:     claim._id,
+                holder: claim.owner,
+                title:  claim.title,
+                claim:  claim.content,
+            };
+        }
+
+        // For employee
+        if (claim.owner != user.did) {
+            throw new PermissionDeniedError();
+        }
 
         return {
             id:         claim._id,
+            issuer:     claim.issuer,
             title:      claim.title,
             claim:      claim.content,
             status:     claim.status,
             careerType: claim.careerType,
             career:     claim.career,
-            issuer,
         };
     }
 
@@ -214,7 +177,9 @@ export class ClaimsService {
             issuer:     issuer.did,
             status:     Const.CLAIM_STATUS_PENDING,
             careerType: Const.CAREER_TYPE_VC,
-        }).exec();
+        })
+        .exec()
+        .catch(() => null);
 
         if (!claim) {
             throw new NotFoundError();

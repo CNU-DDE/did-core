@@ -39,6 +39,7 @@ declare module 'did-core' {
     // -------------------------
     // Interfaces
     // -------------------------
+    // SSI
     export interface KeystoreInterface {
         did:            did_t;
         walletAddress:  address_t;
@@ -67,6 +68,7 @@ declare module 'did-core' {
         verifiablePresentation: vpJwt_t;
     }
 
+    // Claim
     export interface ClaimContentInterface {
         from:   string;
         to:     string;
@@ -74,34 +76,20 @@ declare module 'did-core' {
         what:   string;
     }
 
-    interface UserMinimumInterface {
-        did:            did_t,
-        display_name:   string,
-    }
-
     export interface ClaimMinimumInterface {
         id:         string,
-        issuer?:    UserMinimumInterface,
-        holder?:    UserMinimumInterface,
+        issuer?:    did_t,
+        holder?:    did_t,
         title:      string,
         status?:    number,
-    }
-
-    interface UserDetailInterface {
-        did:            did_t,
-        display_name:   string,
-        contact:        string,
-        email:          string,
-        address:        string,
-        birth?:         string,
     }
 
     export interface ClaimDetailInterface {
         id:         string,
         title:      string,
         claim:      ClaimContentInterface,
-        issuer?:    UserDetailInterface,
-        holder?:    UserDetailInterface,
+        issuer?:    did_t,
+        holder?:    did_t,
         status?:    number,
         careerType?:number,
         career?:    vcJwt_t|ipfsHash_t,
