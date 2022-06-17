@@ -108,7 +108,7 @@ declare module 'did-core' {
 
     export interface ResumeCareerEntryInterface {
         holder:         did_t;
-        verifier:       did_t;
+        issuer:         did_t;
         content:        ClaimContentInterface;
         verify:         JWTProof|IPFSProof;
         isVerified:     boolean;

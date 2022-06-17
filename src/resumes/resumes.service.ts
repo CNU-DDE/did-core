@@ -3,10 +3,13 @@ import {
     ClientFaultError,
     NotFoundError,
 } from 'src/domain/errors.domain';
+import {
+    sendBroccoliGetRequest,
+    sendIPFSGetRequest,
+} from 'src/utils/http.util';
 import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { sendBroccoliGetRequest } from 'src/utils/http.util';
 import { Resume } from './schema/resume.schema';
 import { CreateResumeDto } from './dto/create-resume.dto';
 import { CareerEntryDto } from './dto/post-resume.dto';
@@ -183,7 +186,7 @@ export class ResumesService {
         // Serialize VCs
         const careers = vcs.map(vc => ({
             holder: vc.credentialSubject.id,
-            verifier: vc.issuer.id,
+            issuer: vc.issuer.id,
             content: {
                 from: vc.credentialSubject.from,
                 to: vc.credentialSubject.to,
@@ -194,20 +197,17 @@ export class ResumesService {
             isVerified: true,
         } as dts.ResumeCareerEntryInterface));
 
-        // TODO: resolve IPFS hash
-        careers.push(resume.careers.smartCareers
-        .map((sc: dts.ipfsHash_t) => ({
-            holder: "holder",
-            verifier: "verifier",
-            content: {
-                from: "from",
-                to: "to",
-                where: "where",
-                what: "what",
-            },
-            verify: { type: "IPFS_HASH", hash: sc },
-            isVerified: true,
-        } as dts.ResumeCareerEntryInterface)));
+        // Serialize SmartCareers
+        for(const sc of resume.careers.smartCareers) {
+            const career = (await sendIPFSGetRequest(sc)).data;
+            careers.push({
+                holder:     career.holder,
+                issuer:     career.issuer,
+                content:    career.content,
+                verify:     { type: "IPFS_HASH", hash: sc },
+                isVerified: true,
+            } as dts.ResumeCareerEntryInterface);
+        }
 
         // Serialize
         return {
