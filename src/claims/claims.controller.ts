@@ -27,11 +27,15 @@ export class ClaimsController {
         @Res()  res:        Response,
         @Body() claimsData: PostClaimDto,
     ) {
-        this.claimsService.create(claimsData, req.cookies.access_token)
-        .then(() => {
+        this.claimsService.create(
+            req.cookies.access_token,
+            claimsData.issuer,
+            claimsData.title,
+            claimsData.claim,
+            claimsData.careerType,
+        ).then(() => {
             res.status(http.CREATED).send({ error: null });
-        })
-        .catch(err => {
+        }).catch(err => {
             // Handled error
             if(err instanceof BaseError) {
                 res.status(err.httpStatusCode).send({ error: err.message });

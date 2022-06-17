@@ -17,12 +17,18 @@ export class ClaimsService {
 
     /**
      * Create claim
-     * @param   claimsData:     PostClaimDto
      * @param   accessToken:    accessToken_t
+     * @param   issuerDID:      did_t
+     * @param   title:          string
+     * @param   content:        ClaimContentInterface
+     * @param   careerType:     careerType_t
      */
     async create(
-        claimsData:     PostClaimDto,
         accessToken:    dts.accessToken_t,
+        issuerDID:      dts.did_t,
+        title:          string,
+        content:        dts.ClaimContentInterface,
+        careerType:     dts.careerType_t,
     ) {
         // Validate holder
         const holder = (await sendBroccoliGetRequest("/user/self", accessToken))
@@ -33,7 +39,7 @@ export class ClaimsService {
         }
 
         // Validate issuer
-        const issuer = (await sendBroccoliGetRequest("/user/" + claimsData.issuer, accessToken))
+        const issuer = (await sendBroccoliGetRequest("/user/" + issuerDID, accessToken))
         .data.user_info;
 
         if(issuer.user_type != Const.EMPLOYER_USER_TYPE) {
@@ -44,10 +50,10 @@ export class ClaimsService {
         this.claimModel.create({
             owner:      holder.did,
             issuer:     issuer.did,
-            title:      claimsData.title,
-            content:    claimsData.claim,
-            careerType: claimsData.careerType,
-        });
+            title:      title,
+            content:    content,
+            careerType: careerType,
+        } as CreateClaimDto);
     }
 
     /**
