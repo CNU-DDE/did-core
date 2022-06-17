@@ -1,44 +1,28 @@
 declare module 'did-core' {
-
     // -------------------------
-    // Alias types
+    // Types
     // -------------------------
+    // Basic
+    export type uri_t           = string;
+    export type jwt_t           = string;
+    export type hexadecimal_t   = string;
+    export type sha256_t        = string;
     // DID
-    export type did_t           = string;
-    export type vcJwt_t         = string;
-    export type vpJwt_t         = string;
-    export type address_t       = string;
-    export type privKey_t       = string;
-    export type pubKey_t        = string;
+    export type did_t           = uri_t;
+    export type vcJwt_t         = jwt_t;
+    export type vpJwt_t         = jwt_t;
+    export type address_t       = hexadecimal_t;
+    export type privKey_t       = hexadecimal_t;
+    export type pubKey_t        = hexadecimal_t;
     // DB
     export type mongoId_t       = string;
+    export type mariaId_t       = number;
     // HTTP
     export type accessToken_t   = string;
     // Career
-    export type ipfsHash_t      = string;
+    export type ipfsHash_t      = sha256_t;
     export type encVc_t         = string;
     export type career_t        = encVc_t|ipfsHash_t;
-    // Resume
-    export type mariaId_t       = number;
-    export type positionId_t    = mariaId_t;
-    export type coverLetterId_t = mariaId_t;
-
-    // -------------------------
-    // Literal types
-    // -------------------------
-    export type CLAIM_STATUS_PENDING_LITERAL    = 0;
-    export type CLAIM_STATUS_ACCEPTED_LITERAL   = 1;
-    export type CLAIM_STATUS_REJECTED_LITERAL   = 2;
-    export type claimStatus_t =
-        CLAIM_STATUS_PENDING_LITERAL |
-        CLAIM_STATUS_ACCEPTED_LITERAL |
-        CLAIM_STATUS_REJECTED_LITERAL;
-
-    export type CAREER_TYPE_VC_LITERAL          = 0;
-    export type CAREER_TYPE_IPFS_HASH_LITERAL   = 1;
-    export type careerType_t =
-        CAREER_TYPE_VC_LITERAL |
-        CAREER_TYPE_IPFS_HASH_LITERAL;
 
     // -------------------------
     // Interfaces

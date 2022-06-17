@@ -6,7 +6,7 @@ import {
     IsObject,
     ValidateNested,
 } from 'class-validator'
-import { IsDID } from 'src/validateutils';
+import { IsDID } from 'src/utils/validation.util';
 import { Type } from 'class-transformer';
 import { career_t, did_t } from 'did-core';
 import { ClaimContentDto } from '../nested/claim-content.dto';

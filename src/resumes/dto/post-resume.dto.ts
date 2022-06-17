@@ -2,24 +2,22 @@ import {
     IsInt,
     IsNumber,
     IsString,
-    Min,
     IsDefined,
     IsNotEmptyObject,
     IsObject,
     ValidateNested,
     IsArray,
-    IsIn,
+    IsEnum,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { IsDID } from 'src/validateutils';
-import { did_t, positionId_t, coverLetterId_t, careerType_t, career_t } from 'did-core';
+import { IsDID } from 'src/utils/validation.util';
+import { did_t, career_t, mariaId_t } from 'did-core';
 import { KeystoreDto } from 'src/claims/dto/nested/keystore.dto';
-import Const from 'src/config/const.config';
+import { CareerType } from 'src/domain/enums.domain';
 
 export class CareerEntryDto {
-    @IsInt()
-    @IsIn([ Const.CAREER_TYPE_VC, Const.CAREER_TYPE_IPFS_HASH ])
-    careerType: careerType_t;
+    @IsEnum(CareerType)
+    careerType: CareerType;
 
     @IsString()
     content:    career_t;
@@ -40,11 +38,10 @@ export class PostResumeDto {
     title: string;
 
     @IsInt()
-    @Min(0)
-    positionId: positionId_t;
+    positionId: mariaId_t;
 
     @IsNumber({}, { each: true })
-    coverLetterIds: coverLetterId_t[];
+    coverLetterIds: mariaId_t[];
 
     @IsArray()
     @ValidateNested({ each: true })

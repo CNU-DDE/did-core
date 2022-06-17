@@ -1,15 +1,12 @@
 import {
     Controller,
-    // Param,
     Post,
     Body,
     Req,
     Res,
-    // Get,
-    // Patch,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { BaseError, UnhandledError } from 'src/errors';
+import { BaseError, UnhandledError } from 'src/domain/errors.domain';
 import { ResumesService } from './resumes.service';
 import { PostResumeDto } from './dto/post-resume.dto';
 import { AxiosError } from 'axios';

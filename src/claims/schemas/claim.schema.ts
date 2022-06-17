@@ -1,9 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import {
+    career_t,
     ClaimContentInterface,
     did_t,
 } from 'did-core';
+import { CareerType, ClaimStatus } from 'src/domain/enums.domain';
 
 export class ClaimContent {
     @Prop({ required: true })
@@ -33,22 +35,14 @@ export class Claim extends Document {
     @Prop({ required: true, type: ClaimContent })
     content: ClaimContentInterface;
 
-    //  VALUE   STATUS
-    //  0       PENDING
-    //  1       ACCEPTED
-    //  2       REJECTED
-    @Prop({ default: 0 })
-    status: number;
+    @Prop({ default: ClaimStatus.PENDING })
+    status: ClaimStatus;
 
-    //  VALUE   STATUS
-    //  0       ENC_VC
-    //  1       IPFS
     @Prop({ required: true })
-    careerType: number;
+    careerType: CareerType;
 
-    // ENC_VC or IPFS_HASH
     @Prop({ default: "" })
-    career: string;
+    career: career_t;
 }
 
 export const ClaimSchema = SchemaFactory.createForClass(Claim);

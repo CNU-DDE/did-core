@@ -1,15 +1,11 @@
-import {
-    career_t,
-    CLAIM_STATUS_ACCEPTED_LITERAL,
-    CLAIM_STATUS_REJECTED_LITERAL,
-} from "did-core";
-import {IsBase64, IsIn, IsInt, IsString} from "class-validator";
-import Const from "src/config/const.config";
+import { career_t } from "did-core";
+import { IsBase64, IsEnum, IsIn, IsString } from "class-validator";
+import {ClaimStatus} from "src/domain/enums.domain";
 
 export class UpdateClaimToAcceptedDto {
-    @IsInt()
-    @IsIn([Const.CLAIM_STATUS_ACCEPTED])
-    status: CLAIM_STATUS_ACCEPTED_LITERAL;
+    @IsEnum(ClaimStatus)
+    @IsIn([ClaimStatus.ACCEPTED])
+    status: ClaimStatus.ACCEPTED;
 
     @IsString()
     @IsBase64()
@@ -17,7 +13,7 @@ export class UpdateClaimToAcceptedDto {
 }
 
 export class UpdateClaimToRejectedDto {
-    @IsInt()
-    @IsIn([Const.CLAIM_STATUS_REJECTED])
-    status: CLAIM_STATUS_REJECTED_LITERAL;
+    @IsEnum(ClaimStatus)
+    @IsIn([ClaimStatus.REJECTED])
+    status: ClaimStatus.REJECTED;
 }

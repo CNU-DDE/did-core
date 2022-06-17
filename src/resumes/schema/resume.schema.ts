@@ -1,10 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import {
-    coverLetterId_t,
     did_t,
     ipfsHash_t,
-    positionId_t,
+    mariaId_t,
     ResumeCareersInterface,
     vpJwt_t,
 } from 'did-core';
@@ -29,10 +28,10 @@ export class Resume extends Document {
     title: string;
 
     @Prop({ required: true })
-    positionId: positionId_t;
+    positionId: mariaId_t;
 
     @Prop({ type: [Number], default: [] })
-    coverLetterIds: coverLetterId_t[];
+    coverLetterIds: mariaId_t[];
 
     @Prop({ type: Careers, default: {} })
     careers: ResumeCareersInterface;

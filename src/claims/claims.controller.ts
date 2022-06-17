@@ -12,7 +12,7 @@ import { Request, Response } from 'express';
 import { ClaimsService } from './claims.service';
 import { PostDto } from './dto/http/post-claim.dto';
 import { PatchClaimDto } from './dto/http/patch-claim.dto';
-import { BaseError, UnhandledError } from 'src/errors';
+import { BaseError, UnhandledError } from 'src/domain/errors.domain';
 import { AxiosError } from 'axios';
 import { StatusCodes as http } from 'http-status-codes';
 import Const from 'src/config/const.config';

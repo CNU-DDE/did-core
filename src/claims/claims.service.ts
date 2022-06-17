@@ -2,13 +2,13 @@ import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Claim } from './schemas/claim.schema';
-import { sendBroccoliGetRequest } from 'src/httputils';
-import { PermissionDeniedError, NotFoundError } from 'src/errors';
-import { createVC } from 'src/did';
+import { sendBroccoliGetRequest } from 'src/utils/http.util';
+import { PermissionDeniedError, NotFoundError } from 'src/domain/errors.domain';
+import { UserType, ClaimStatus, CareerType } from 'src/domain/enums.domain';
+import { createVC } from 'src/utils/did.util';
 import { encrypt } from 'eciesjs';
 import { CreateCareerDto, CreateClaimDto } from './dto/store/create-claim.dto';
 import { UpdateClaimToAcceptedDto, UpdateClaimToRejectedDto } from './dto/store/update-claim.dto';
-import Const from 'src/config/const.config';
 import * as dts from 'did-core';
 import {PostCareerDto, PostClaimDto, PostDto} from './dto/http/post-claim.dto';
 
@@ -36,7 +36,7 @@ export class ClaimsService {
             const holder = (await sendBroccoliGetRequest("/user/self", accessToken))
             .data.user_info;
 
-            if(holder.user_type != Const.EMPLOYEE_USER_TYPE) {
+            if(holder.user_type != UserType.EMPLOYEE) {
                 throw new PermissionDeniedError()
             }
 
@@ -44,7 +44,7 @@ export class ClaimsService {
             const issuerObj = (await sendBroccoliGetRequest("/user/" + issuer, accessToken))
             .data.user_info;
 
-            if(issuerObj.user_type != Const.EMPLOYER_USER_TYPE) {
+            if(issuerObj.user_type != UserType.EMPLOYER) {
                 throw new PermissionDeniedError()
             }
 
@@ -54,7 +54,7 @@ export class ClaimsService {
                 issuer:     issuerObj.did,
                 title:      title,
                 content:    claim,
-                careerType: Const.CAREER_TYPE_VC,
+                careerType: CareerType.ENC_VC,
             } as CreateClaimDto);
         } else if (body["career"]) {
             const {
@@ -68,7 +68,7 @@ export class ClaimsService {
             const ownerObj = (await sendBroccoliGetRequest("/user/" + owner, accessToken))
             .data.user_info;
 
-            if(ownerObj.user_type != Const.EMPLOYEE_USER_TYPE) {
+            if(ownerObj.user_type != UserType.EMPLOYEE) {
                 throw new PermissionDeniedError()
             }
 
@@ -76,7 +76,7 @@ export class ClaimsService {
             const issuerObj = (await sendBroccoliGetRequest("/user/" + issuer, accessToken))
             .data.user_info;
 
-            if(issuerObj.user_type != Const.EMPLOYER_USER_TYPE) {
+            if(issuerObj.user_type != UserType.EMPLOYER) {
                 throw new PermissionDeniedError()
             }
 
@@ -93,8 +93,8 @@ export class ClaimsService {
                 owner:      ownerObj.did,
                 issuer:     issuerObj.did,
                 title:      title,
-                careerType: Const.CAREER_TYPE_IPFS_HASH,
-                status:     Const.CLAIM_STATUS_ACCEPTED,
+                careerType: CareerType.IPFS_HASH,
+                status:     ClaimStatus.ACCEPTED,
                 content,
                 career,
             } as CreateCareerDto);
@@ -114,7 +114,7 @@ export class ClaimsService {
         .data.user_info;
 
         // For employer
-        if(user.user_type == Const.EMPLOYER_USER_TYPE) {
+        if(user.user_type == UserType.EMPLOYER) {
             const claims = await this.claimModel.find({
                 issuer: user.did,
                 status: 0,
@@ -164,7 +164,7 @@ export class ClaimsService {
         }
 
         // For employer
-        if(user.user_type == Const.EMPLOYER_USER_TYPE) {
+        if(user.user_type == UserType.EMPLOYER) {
 
             if (claim.issuer != user.did) {
                 throw new PermissionDeniedError();
@@ -203,7 +203,7 @@ export class ClaimsService {
      */
     async updateVC(
         claimId:        dts.mongoId_t,
-        status:         dts.claimStatus_t,
+        status:         ClaimStatus,
         keystore:       dts.KeystoreInterface,
         accessToken:    dts.accessToken_t,
     ) {
@@ -212,7 +212,7 @@ export class ClaimsService {
         .data.user_info;
 
         // Issuer must be employer
-        if (issuer.user_type != Const.EMPLOYER_USER_TYPE) {
+        if (issuer.user_type != UserType.EMPLOYER) {
             throw new PermissionDeniedError()
         }
 
@@ -220,8 +220,8 @@ export class ClaimsService {
         const claim = await this.claimModel.findOne({
             _id:         claimId,
             issuer:     issuer.did,
-            status:     Const.CLAIM_STATUS_PENDING,
-            careerType: Const.CAREER_TYPE_VC,
+            status:     ClaimStatus.PENDING,
+            careerType: CareerType.ENC_VC,
         })
         .exec()
         .catch(() => null);
@@ -231,11 +231,11 @@ export class ClaimsService {
         }
 
         // For CLAIM_STATUS_REJECTED
-        if (status == Const.CLAIM_STATUS_REJECTED) {
+        if (status == ClaimStatus.REJECTED) {
 
             // Update status and return
             await this.claimModel.findByIdAndUpdate({ _id: claimId }, {
-                status: Const.CLAIM_STATUS_REJECTED,
+                status: ClaimStatus.REJECTED,
             } as UpdateClaimToRejectedDto);
             return;
         }
@@ -259,7 +259,7 @@ export class ClaimsService {
 
         // Update claim
         await this.claimModel.findByIdAndUpdate({ _id: claimId }, {
-            status: Const.CLAIM_STATUS_ACCEPTED,
+            status: ClaimStatus.ACCEPTED,
             career: encrypt(holderPub, vc).toString("base64"),
         } as UpdateClaimToAcceptedDto);
     }

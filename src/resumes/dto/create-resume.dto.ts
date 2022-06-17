@@ -2,7 +2,6 @@ import {
     IsInt,
     IsNumber,
     IsString,
-    Min,
     IsDefined,
     IsNotEmptyObject,
     IsObject,
@@ -11,8 +10,8 @@ import {
     IsJWT,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { IsDID } from 'src/validateutils';
-import { did_t, positionId_t, coverLetterId_t, vpJwt_t, ipfsHash_t } from 'did-core';
+import { IsDID } from 'src/utils/validation.util';
+import { did_t, vpJwt_t, ipfsHash_t, mariaId_t } from 'did-core';
 
 export class CareersDto {
     @IsOptional()
@@ -35,12 +34,11 @@ export class CreateResumeDto {
     title: string;
 
     @IsInt()
-    @Min(0)
-    positionId: positionId_t;
+    positionId: mariaId_t;
 
     @IsOptional()
     @IsNumber({}, { each: true })
-    coverLetterIds: coverLetterId_t[];
+    coverLetterIds: mariaId_t[];
 
     @IsOptional()
     @IsDefined()
