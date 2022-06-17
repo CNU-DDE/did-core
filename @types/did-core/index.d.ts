@@ -88,4 +88,11 @@ declare module 'did-core' {
         vp:             vpJwt_t,
         smartCareers:   ipfsHash_t[],
     }
+
+    export interface ResumeMinimumInterface {
+        id:         string,
+        holder?:    did_t,
+        verifier?:  did_t,
+        title:      string,
+    }
 }

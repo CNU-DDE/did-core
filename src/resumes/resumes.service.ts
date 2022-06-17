@@ -7,7 +7,7 @@ import { Resume } from './schema/resume.schema';
 import { CreateResumeDto } from './dto/create-resume.dto';
 import { CareerEntryDto } from './dto/post-resume.dto';
 import { createVP } from 'src/utils/did.util';
-import {CareerType, UserType} from 'src/domain/enums.domain';
+import { CareerType, UserType } from 'src/domain/enums.domain';
 import * as dts from 'did-core';
 
 @Injectable()
@@ -15,7 +15,7 @@ export class ResumesService {
     constructor(@InjectModel(Resume.name) private resumeModel: Model<Resume>) {}
 
     /**
-     * Create claim
+     * Create resume
      * @param   accessToken:    accessToken_t
      * @param   keystore:       KeystoreInterface
      * @param   verifier:       did_t
@@ -78,5 +78,67 @@ export class ResumesService {
             coverLetterIds,
             careers,
         } as CreateResumeDto);
+    }
+
+    /**
+     * Get all resume for user
+     * @param   accessToken:    accessToken_t
+     * @param   positionId:     mariaId_t
+     */
+    async getAll(
+        accessToken:    dts.accessToken_t,
+        positionId:     dts.mariaId_t|undefined,
+    ): Promise<dts.ResumeMinimumInterface[]> {
+
+        // Get user info
+        const user = (await sendBroccoliGetRequest("/user/self", accessToken))
+        .data.user_info;
+
+        // Position ID specified
+        if (positionId) {
+            // Only an employer can query with positionId
+            if(user.user_type != UserType.EMPLOYER) {
+                throw new PermissionDeniedError();
+            }
+
+            // Get resumes
+            const resumes = await this.resumeModel.find({
+                positionId,
+                verifier: user.did,
+            }).exec()
+
+            // Serialize
+            return resumes.map(resume => ({
+                id:         resume._id,
+                title:      resume.title,
+                holder:     resume.owner,
+            }));
+        }
+
+        // For employer
+        if(user.user_type == UserType.EMPLOYER) {
+            // Get resumes
+            const resumes = await this.resumeModel.find({
+                verifier: user.did,
+            }).exec();
+
+            // Serialize
+            return resumes.map(resume => ({
+                id:     resume._id,
+                title:  resume.title,
+                holder: resume.owner,
+            }));
+        }
+
+        // For employee
+        const resumes = await this.resumeModel.find({
+            owner:  user.did,
+        }).exec();
+
+        return resumes.map(resume => ({
+            id:         resume._id,
+            title:      resume.title,
+            verifier:   resume.verifier,
+        }));
     }
 }
