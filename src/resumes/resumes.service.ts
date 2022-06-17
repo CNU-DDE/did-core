@@ -1,12 +1,16 @@
+import {
+    PermissionDeniedError,
+    ClientFaultError,
+    NotFoundError,
+} from 'src/domain/errors.domain';
 import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { sendBroccoliGetRequest } from 'src/utils/http.util';
-import { PermissionDeniedError, ClientFaultError } from 'src/domain/errors.domain';
 import { Resume } from './schema/resume.schema';
 import { CreateResumeDto } from './dto/create-resume.dto';
 import { CareerEntryDto } from './dto/post-resume.dto';
-import { createVP } from 'src/utils/did.util';
+import { createVP, verifyVP } from 'src/utils/did.util';
 import { CareerType, UserType } from 'src/domain/enums.domain';
 import * as dts from 'did-core';
 
@@ -140,5 +144,80 @@ export class ResumesService {
             title:      resume.title,
             verifier:   resume.verifier,
         }));
+    }
+
+    /**
+     * Get a resume for an user
+     * @param   resumeId:       mongoId_t
+     * @param   accessToken:    accessToken_t
+     */
+    async getOne(
+        resumeId:       dts.mongoId_t,
+        accessToken:    dts.accessToken_t,
+    ): Promise<dts.ResumeDetailInterface> {
+
+        // Get user info
+        const user = (await sendBroccoliGetRequest("/user/self", accessToken))
+        .data.user_info;
+
+        // Get a resume
+        const resume = await this.resumeModel.findOne({ _id: resumeId })
+        .exec()
+        .catch(() => null);
+
+        if (!resume) {
+            throw new NotFoundError();
+        }
+
+        // Permission check
+        if  ((user.user_type == UserType.EMPLOYER && resume.verifier != user.did) ||
+            (user.user_type == UserType.EMPLOYEE && resume.owner != user.did)) {
+            throw new PermissionDeniedError();
+        }
+
+        // Get VC
+        const vcs = (await verifyVP(resume.careers.vp))
+        .verifiablePresentation
+        .verifiableCredential;
+
+        // Serialize VCs
+        const careers = vcs.map(vc => ({
+            holder: vc.credentialSubject.id,
+            verifier: vc.issuer.id,
+            content: {
+                from: vc.credentialSubject.from,
+                to: vc.credentialSubject.to,
+                where: vc.credentialSubject.where,
+                what: vc.credentialSubject.what,
+            },
+            verify: vc.proof as dts.JWTProof,
+            isVerified: true,
+        } as dts.ResumeCareerEntryInterface));
+
+        // TODO: resolve IPFS hash
+        careers.push(resume.careers.smartCareers
+        .map((sc: dts.ipfsHash_t) => ({
+            holder: "holder",
+            verifier: "verifier",
+            content: {
+                from: "from",
+                to: "to",
+                where: "where",
+                what: "what",
+            },
+            verify: { type: "IPFS_HASH", hash: sc },
+            isVerified: true,
+        } as dts.ResumeCareerEntryInterface)));
+
+        // Serialize
+        return {
+            id:             resume._id,
+            owner:          resume.owner,
+            verifier:       resume.verifier,
+            title:          resume.title,
+            positionId:     resume.positionId,
+            coverLetterId:  resume.coverLetterIds,
+            careers,
+        };
     }
 }

@@ -90,9 +90,37 @@ declare module 'did-core' {
     }
 
     export interface ResumeMinimumInterface {
-        id:         string,
+        id:         mongoId_t,
         holder?:    did_t,
         verifier?:  did_t,
         title:      string,
+    }
+
+    export interface JWTProof {
+        type:       "JwtProof2020";
+        jwt:        vcJwt_t;
+    }
+
+    export interface IPFSProof {
+        type:       "IPFS_HASH",
+        hash:       ipfsHash_t,
+    }
+
+    export interface ResumeCareerEntryInterface {
+        holder:         did_t;
+        verifier:       did_t;
+        content:        ClaimContentInterface;
+        verify:         JWTProof|IPFSProof;
+        isVerified:     boolean;
+    }
+
+    export interface ResumeDetailInterface {
+        id:             mongoId_t,
+        owner:          did_t,
+        verifier:       did_t,
+        title:          string,
+        positionId:     mariaId_t,
+        coverLetterId:  mariaId_t[],
+        careers:        ResumeCareerEntryInterface[],
     }
 }
