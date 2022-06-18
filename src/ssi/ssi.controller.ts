@@ -22,7 +22,7 @@ export class SsiController {
      * @reqBody         nil
      * @response        { error: ErrorMessage, content: GeneratedDID }
      */
-    @Get('/ssi/did')
+    @Get('/did')
     getDID(
         @Res()  res:    Response,
     ) {
@@ -49,7 +49,7 @@ export class SsiController {
      * @reqBody         nil
      * @response        { error: ErrorMessage, content: ResolvedDIDDocument }
      */
-    @Get('/ssi/did-document/:did')
+    @Get('/did-document/:did')
     getDIDDoc(
         @Res()          res:    Response,
         @Param('did')   did:    string,
@@ -85,7 +85,7 @@ export class SsiController {
      * @reqBody         { holderDID: string, claim: object, issuerDID: string, issuerPriv: string }
      * @response        { error: ErrorMessage, content: GeneratedVC }
      */
-    @Post('/ssi/verifiable-credential')
+    @Post('/verifiable-credential')
     postVerifiableCredential(
         @Body() body:   dto.PostVerifiableCredentialDto,
         @Res()  res:    Response
@@ -118,7 +118,7 @@ export class SsiController {
      * @reqBody         { holderDID: string, holderPriv: string, verifiableCredentials: []string }
      * @response        { error: ErrorMessage, content: VerifiedVC }
      */
-    @Post('/ssi/verifiable-presentation')
+    @Post('/verifiable-presentation')
     postVerfiablePresentation(
         @Res()  res:    Response,
         @Body() body:   dto.PostVerifiablePresentationDto,
@@ -149,7 +149,7 @@ export class SsiController {
      * @reqBody         { verifiableCredential: string }
      * @response        { error: ErrorMessage, content: VerifiedVC }
      */
-    @Post('/ssi/verified-credential')
+    @Post('/verified-credential')
     postVerifiedCredential(
         @Res()  res:    Response,
         @Body() body:   dto.PostVerifiedCredentialDto,
@@ -185,7 +185,7 @@ export class SsiController {
      * @reqBody         { verifiablePresentation: string }
      * @response        { error: ErrorMessage, content: VerifiedVP }
      */
-    @Post('/ssi/verified-presentation')
+    @Post('/verified-presentation')
     postVerifiedPresentation(
         @Res()  res:    Response,
         @Body() body:   dto.PostVerifiedPresentationDto,

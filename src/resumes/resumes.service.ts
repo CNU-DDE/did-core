@@ -13,15 +13,18 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Resume } from './schema/resume.schema';
 import { CreateResumeDto } from './dto/create-resume.dto';
 import { CareerEntryDto } from './dto/post-resume.dto';
-import { createVP, verifyVP } from 'src/utils/did.util';
 import { CareerType, UserType } from 'src/domain/enums.domain';
 import { KeystoreDto } from 'src/ssi/dto/keystore.dto';
 import * as dts from 'did-core';
 import * as iface from './dto/get-resume.iface';
+import {SsiService} from 'src/ssi/ssi.service';
 
 @Injectable()
 export class ResumesService {
-    constructor(@InjectModel(Resume.name) private resumeModel: Model<Resume>) {}
+    constructor(
+        @InjectModel(Resume.name) private resumeModel: Model<Resume>,
+        private readonly ssiService: SsiService,
+    ) {}
 
     /**
      * Create resume
@@ -73,7 +76,9 @@ export class ResumesService {
         .filter(career => career.careerType == CareerType.IPFS_HASH)
         .map(career => career.content);
 
-        const vp = vcs.length == 0 ? "" : await createVP(holderObj.did, keystore.privKey, vcs);
+        const vp = vcs.length > 0
+            ? await this.ssiService.createVP(holderObj.did, keystore.privKey, vcs)
+            : "";
 
         // Get VP and SmartCareers
         const careers = { vp, smartCareers };
@@ -181,7 +186,7 @@ export class ResumesService {
         }
 
         // Get VC
-        const vcs = (await verifyVP(resume.careers.vp))
+        const vcs = (await this.ssiService.verifyVP(resume.careers.vp))
         .verifiablePresentation
         .verifiableCredential;
 

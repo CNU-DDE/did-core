@@ -8,7 +8,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Claim } from './schemas/claim.schema';
 import { PermissionDeniedError, NotFoundError } from 'src/domain/errors.domain';
 import { UserType, ClaimStatus, CareerType } from 'src/domain/enums.domain';
-import { createVC } from 'src/utils/did.util';
 import { encrypt } from 'eciesjs';
 import { CreateCareerDto, CreateClaimDto } from './dto/store/create-claim.dto';
 import { UpdateClaimToAcceptedDto, UpdateClaimToRejectedDto } from './dto/store/update-claim.dto';
@@ -16,10 +15,14 @@ import { PostCareerDto, PostClaimDto, PostDto } from './dto/http/post-claim.dto'
 import { KeystoreDto } from 'src/ssi/dto/keystore.dto';
 import * as dts from 'did-core';
 import { ClaimMinimumInterface, ClaimDetailInterface } from './dto/get-claim.iface';
+import {SsiService} from 'src/ssi/ssi.service';
 
 @Injectable()
 export class ClaimsService {
-    constructor(@InjectModel(Claim.name) private claimModel: Model<Claim>) {}
+    constructor(
+        @InjectModel(Claim.name) private claimModel: Model<Claim>,
+        private readonly ssiService: SsiService,
+    ) {}
 
     /**
      * Create claim
@@ -244,7 +247,7 @@ export class ClaimsService {
         }
 
         // Create VC
-        const vc = Buffer.from(await createVC(
+        const vc = Buffer.from(await this.ssiService.createVC(
             claim.owner,        // Holder DID
             claim.content,       // Claim
             issuer.did,         // Issuer DID

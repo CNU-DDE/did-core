@@ -9,11 +9,16 @@ import {
 import { Type } from 'class-transformer';
 import { ClaimContentDto } from 'src/claims/dto/nested/claim-content.dto';
 import { IsDID } from 'src/utils/validation.util';
-import * as dts from 'did-core';
+import {
+    did_t,
+    privKey_t,
+    vcJwt_t,
+    vpJwt_t,
+} from 'did-core';
 
 export class PostVerifiableCredentialDto {
     @IsDID()
-    holderDID:  dts.did_t;
+    holderDID:  did_t;
 
     @IsDefined()
     @IsNotEmptyObject()
@@ -23,29 +28,29 @@ export class PostVerifiableCredentialDto {
     claim:      ClaimContentDto;
 
     @IsDID()
-    issuerDID:  dts.did_t;
+    issuerDID:  did_t;
 
     @IsHexadecimal()
-    issuerPriv: dts.privKey_t;
+    issuerPriv: privKey_t;
 }
 
 export class PostVerifiablePresentationDto {
     @IsDID()
-    holderDID:              dts.did_t;
+    holderDID:              did_t;
 
     @IsHexadecimal()
-    holderPriv:             dts.privKey_t;
+    holderPriv:             privKey_t;
 
     @IsJWT({ each: true })
-    verifiableCredentials:  dts.vcJwt_t[];
+    verifiableCredentials:  vcJwt_t[];
 }
 
 export class PostVerifiedCredentialDto {
     @IsJWT()
-    verifiableCredential:   dts.vcJwt_t;
+    verifiableCredential:   vcJwt_t;
 }
 
 export class PostVerifiedPresentationDto {
     @IsJWT()
-    verifiablePresentation: dts.vpJwt_t;
+    verifiablePresentation: vpJwt_t;
 }
