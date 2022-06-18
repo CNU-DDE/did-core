@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ClaimsModule } from './claims/claims.module';
 import { ResumesModule } from './resumes/resumes.module';
 import { LoggerModule } from 'nestjs-pino';
+import { SsiModule } from './ssi/ssi.module';
 import Env from './config/env.config';
 
 @Module({
@@ -11,6 +12,7 @@ import Env from './config/env.config';
         LoggerModule.forRoot(),
         ClaimsModule,
         ResumesModule,
+        SsiModule,
     ],
 })
 export class AppModule {}
