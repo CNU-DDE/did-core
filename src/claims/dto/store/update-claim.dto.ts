@@ -1,6 +1,6 @@
 import { career_t } from "did-core";
 import { IsBase64, IsEnum, IsIn, IsString } from "class-validator";
-import {ClaimStatus} from "src/domain/enums.domain";
+import { ClaimStatus } from "src/domain/enums.domain";
 
 export class UpdateClaimToAcceptedDto {
     @IsEnum(ClaimStatus)

@@ -4,7 +4,6 @@ import {
     did_t,
     ipfsHash_t,
     mariaId_t,
-    ResumeCareersInterface,
     vpJwt_t,
 } from 'did-core';
 
@@ -34,7 +33,7 @@ export class Resume extends Document {
     coverLetterIds: mariaId_t[];
 
     @Prop({ type: Careers, default: {} })
-    careers: ResumeCareersInterface;
+    careers: Careers;
 }
 
 export const ResumeSchema = SchemaFactory.createForClass(Resume);
