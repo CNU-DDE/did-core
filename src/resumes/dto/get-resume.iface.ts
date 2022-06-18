@@ -19,9 +19,9 @@ export interface IPFSProof {
 }
 
 export interface ResumeCareerEntryInterface {
-    holder:         dts.did_t;
-    issuer:         dts.did_t;
-    content:        ClaimContentInterface;
+    holder?:         dts.did_t;
+    issuer?:         dts.did_t;
+    content?:        ClaimContentInterface;
     verify:         JWTProof|IPFSProof;
     isVerified:     boolean;
 }

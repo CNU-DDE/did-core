@@ -206,14 +206,21 @@ export class ResumesService {
 
         // Serialize SmartCareers
         for(const sc of resume.careers.smartCareers) {
-            const career = (await sendIPFSGetRequest(sc)).data;
-            careers.push({
-                holder:     career.holder,
-                issuer:     career.issuer,
-                content:    career.content,
-                verify:     { type: "IPFS_HASH", hash: sc },
-                isVerified: true,
-            } as iface.ResumeCareerEntryInterface);
+            try {
+                const career = (await sendIPFSGetRequest(sc)).data;
+                careers.push({
+                    holder:     career.holder,
+                    issuer:     career.issuer,
+                    content:    career.content,
+                    verify:     { type: "IPFS_HASH", hash: sc },
+                    isVerified: true,
+                } as iface.ResumeCareerEntryInterface);
+            } catch {
+                careers.push({
+                    verify:     { type: "IPFS_HASH", hash: sc },
+                    isVerified: false,
+                } as iface.ResumeCareerEntryInterface);
+            }
         }
 
         // Serialize
