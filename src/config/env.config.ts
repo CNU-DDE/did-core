@@ -12,8 +12,6 @@ export default class Env {
         mongodb: {
             host:           "MONGODB_HOST",
             port:           "MONGODB_PORT",
-            rootUser:       "MONGODB_ROOT_USER",
-            rootPassword:   "MONGODB_ROOT_PASSWORD",
             user:           "MONGODB_USER",
             password:       "MONGODB_PASSWORD",
             database:       "MONGODB_DATABASE",
