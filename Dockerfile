@@ -17,10 +17,14 @@ LABEL image_version="1.0.0"
 LABEL app_version="1.0.0"
 LABEL description="Injik/did-core API server image"
 
-WORKDIR /opt
+WORKDIR /etc/injik/didcore
 COPY --from=bundler /usr/src/app/dist ./dist
 COPY --from=bundler /usr/src/app/package*.json ./
+COPY --from=bundler /usr/src/app/docker-entrypoint.sh ./
 RUN npm install --only=prod
 
+RUN adduser -u 5678 --disabled-password --gecos "" injik && chown -R injik /etc/injik/didcore
+USER injik
+
 EXPOSE 7771
-ENTRYPOINT [ "node", "dist/main" ]
+ENTRYPOINT [ "/etc/injik/didcore/docker-entrypoint.sh" ]
