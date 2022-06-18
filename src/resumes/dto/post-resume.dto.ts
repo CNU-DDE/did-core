@@ -12,7 +12,7 @@ import {
 import { Type } from 'class-transformer';
 import { IsDID } from 'src/utils/validation.util';
 import { did_t, career_t, mariaId_t } from 'did-core';
-import { KeystoreDto } from 'src/claims/dto/nested/keystore.dto';
+import { KeystoreDto } from 'src/ssi/dto/keystore.dto';
 import { CareerType } from 'src/domain/enums.domain';
 
 export class CareerEntryDto {

@@ -7,6 +7,7 @@ declare module 'did-core' {
     export type jwt_t           = string;
     export type hexadecimal_t   = string;
     export type sha256_t        = string;
+    export type eciesCipher_t   = string;
     // DID
     export type did_t           = uri_t;
     export type vcJwt_t         = jwt_t;
@@ -18,9 +19,9 @@ declare module 'did-core' {
     export type mongoId_t       = string;
     export type mariaId_t       = number;
     // HTTP
-    export type accessToken_t   = string;
+    export type accessToken_t   = jwt_t;
     // Career
     export type ipfsHash_t      = sha256_t;
-    export type encVc_t         = string;
+    export type encVc_t         = eciesCipher_t;
     export type career_t        = encVc_t|ipfsHash_t;
 }

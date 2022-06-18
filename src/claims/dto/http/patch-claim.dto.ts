@@ -8,7 +8,7 @@ import {
     IsEnum,
 } from 'class-validator'
 import { Type } from 'class-transformer';
-import { KeystoreDto } from '../nested/keystore.dto';
+import { KeystoreDto } from 'src/ssi/dto/keystore.dto';
 import {ClaimStatus} from 'src/domain/enums.domain';
 
 export class PatchClaimDto {

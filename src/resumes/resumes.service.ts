@@ -15,7 +15,9 @@ import { CreateResumeDto } from './dto/create-resume.dto';
 import { CareerEntryDto } from './dto/post-resume.dto';
 import { createVP, verifyVP } from 'src/utils/did.util';
 import { CareerType, UserType } from 'src/domain/enums.domain';
+import { KeystoreDto } from 'src/ssi/dto/keystore.dto';
 import * as dts from 'did-core';
+import * as iface from './dto/get-resume.iface';
 
 @Injectable()
 export class ResumesService {
@@ -33,7 +35,7 @@ export class ResumesService {
      */
     async create(
         accessToken:    dts.accessToken_t,
-        keystore:       dts.KeystoreInterface,
+        keystore:       KeystoreDto,
         verifier:       dts.did_t,
         title:          string,
         positionId:     dts.mariaId_t,
@@ -95,7 +97,7 @@ export class ResumesService {
     async getAll(
         accessToken:    dts.accessToken_t,
         positionId:     dts.mariaId_t|undefined,
-    ): Promise<dts.ResumeMinimumInterface[]> {
+    ): Promise<iface.ResumeMinimumInterface[]> {
 
         // Get user info
         const user = (await sendBroccoliGetRequest("/user/self", accessToken))
@@ -157,7 +159,7 @@ export class ResumesService {
     async getOne(
         resumeId:       dts.mongoId_t,
         accessToken:    dts.accessToken_t,
-    ): Promise<dts.ResumeDetailInterface> {
+    ): Promise<iface.ResumeDetailInterface> {
 
         // Get user info
         const user = (await sendBroccoliGetRequest("/user/self", accessToken))
@@ -193,9 +195,9 @@ export class ResumesService {
                 where: vc.credentialSubject.where,
                 what: vc.credentialSubject.what,
             },
-            verify: vc.proof as dts.JWTProof,
+            verify: vc.proof as iface.JWTProof,
             isVerified: true,
-        } as dts.ResumeCareerEntryInterface));
+        } as iface.ResumeCareerEntryInterface));
 
         // Serialize SmartCareers
         for(const sc of resume.careers.smartCareers) {
@@ -206,7 +208,7 @@ export class ResumesService {
                 content:    career.content,
                 verify:     { type: "IPFS_HASH", hash: sc },
                 isVerified: true,
-            } as dts.ResumeCareerEntryInterface);
+            } as iface.ResumeCareerEntryInterface);
         }
 
         // Serialize

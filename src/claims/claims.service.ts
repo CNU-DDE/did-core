@@ -12,8 +12,10 @@ import { createVC } from 'src/utils/did.util';
 import { encrypt } from 'eciesjs';
 import { CreateCareerDto, CreateClaimDto } from './dto/store/create-claim.dto';
 import { UpdateClaimToAcceptedDto, UpdateClaimToRejectedDto } from './dto/store/update-claim.dto';
+import { PostCareerDto, PostClaimDto, PostDto } from './dto/http/post-claim.dto';
+import { KeystoreDto } from 'src/ssi/dto/keystore.dto';
 import * as dts from 'did-core';
-import {PostCareerDto, PostClaimDto, PostDto} from './dto/http/post-claim.dto';
+import { ClaimMinimumInterface, ClaimDetailInterface } from './dto/get-claim.iface';
 
 @Injectable()
 export class ClaimsService {
@@ -102,7 +104,7 @@ export class ClaimsService {
      */
     async getAll(
         accessToken:    dts.accessToken_t,
-    ): Promise<dts.ClaimMinimumInterface[]> {
+    ): Promise<ClaimMinimumInterface[]> {
 
         // Get user info
         const user = (await sendBroccoliGetRequest("/user/self", accessToken))
@@ -143,7 +145,7 @@ export class ClaimsService {
     async getOne(
         claimId:        dts.mongoId_t,
         accessToken:    dts.accessToken_t,
-    ): Promise<dts.ClaimDetailInterface> {
+    ): Promise<ClaimDetailInterface> {
 
         // Get user info
         const user = (await sendBroccoliGetRequest("/user/self", accessToken))
@@ -199,7 +201,7 @@ export class ClaimsService {
     async updateVC(
         claimId:        dts.mongoId_t,
         status:         ClaimStatus,
-        keystore:       dts.KeystoreInterface,
+        keystore:       KeystoreDto,
         accessToken:    dts.accessToken_t,
     ) {
         // Validate issuer
