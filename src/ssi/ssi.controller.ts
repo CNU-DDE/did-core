@@ -10,6 +10,7 @@ import { Response } from 'express';
 import { SsiService } from './ssi.service';
 import * as errors from 'src/domain/errors.domain';
 import * as dto from './dto/post-req.dto';
+import {errorHandlerCallback} from 'src/utils/callback.util';
 
 @Controller('ssi')
 export class SsiController {
@@ -26,7 +27,6 @@ export class SsiController {
     getDID(
         @Res()  res:    Response,
     ) {
-
         try {
             res.send(JSON.stringify({
                 error: null,
@@ -55,27 +55,9 @@ export class SsiController {
         @Param('did')   did:    string,
     ) {
         this.ssiService.resolveDID(did)
-        .then(doc => {
-            res.send(JSON.stringify({
-                error: null,
-                content: doc,
-            }));
-        }).catch((err: Error) => {
-            if(err instanceof errors.InfuraProjectIdImportFailureError) {
-                res.status(err.httpStatusCode)
-                .send(JSON.stringify({
-                    error: err.message,
-                    content: null,
-                }));
-            } else {
-                const wrapped = new errors.UnhandledError(err);
-                res.status(wrapped.httpStatusCode)
-                .send(JSON.stringify({
-                    error: wrapped.message,
-                    content: null,
-                }));
-            }
-        });
+        .then(content => {
+            res.send({ error: null, content });
+        }).catch(errorHandlerCallback(res));
     }
 
     /**
@@ -96,19 +78,9 @@ export class SsiController {
             body.claim,
             body.issuerDID,
             body.issuerPriv,
-        ).then((vc) => {
-            res.send(JSON.stringify({
-                error: null,
-                content: vc,
-            }));
-        }).catch((err: Error) => {
-            const wrapped = new errors.UnhandledError(err);
-            res.status(wrapped.httpStatusCode)
-            .send(JSON.stringify({
-                error: wrapped.message,
-                content: null,
-            }));
-        });
+        ).then(content => {
+            res.send({ error: null, content });
+        }).catch(errorHandlerCallback(res));
     }
 
     /**
@@ -127,19 +99,9 @@ export class SsiController {
             body.holderDID,
             body.holderPriv,
             body.verifiableCredentials
-        ).then((vp) => {
-            res.send(JSON.stringify({
-                error: null,
-                content: vp,
-            }));
-        }).catch((err: Error) => {
-            const wrapped = new errors.UnhandledError(err);
-            res.status(wrapped.httpStatusCode)
-            .send(JSON.stringify({
-                error: wrapped.message,
-                content: null,
-            }));
-        });
+        ).then(content => {
+            res.send({ error: null, content });
+        }).catch(errorHandlerCallback(res));
     }
 
     /**
@@ -155,27 +117,9 @@ export class SsiController {
         @Body() body:   dto.PostVerifiedCredentialDto,
     ) {
         this.ssiService.verifyVC(body.verifiableCredential)
-        .then((vc) => {
-            res.send(JSON.stringify({
-                error: null,
-                content: vc,
-            }));
-        }).catch((err: Error) => {
-            if(err instanceof errors.VerifyVCFailureError) {
-                res.status(err.httpStatusCode)
-                .send(JSON.stringify({
-                    error: err.message,
-                    content: null,
-                }));
-            } else {
-                const wrapped = new errors.UnhandledError(err);
-                res.status(wrapped.httpStatusCode)
-                .send(JSON.stringify({
-                    error: wrapped.message,
-                    content: null,
-                }));
-            }
-        });
+        .then(content => {
+            res.send({ error: null, content });
+        }).catch(errorHandlerCallback(res));
     }
 
     /**
@@ -191,26 +135,8 @@ export class SsiController {
         @Body() body:   dto.PostVerifiedPresentationDto,
     ) {
         this.ssiService.verifyVP(body.verifiablePresentation)
-        .then((vp) => {
-            res.send(JSON.stringify({
-                error: null,
-                content: vp,
-            }));
-        }).catch((err: Error) => {
-            if(err instanceof errors.VerifyVPFailureError) {
-                res.status(err.httpStatusCode)
-                .send(JSON.stringify({
-                    error: err.message,
-                    content: null,
-                }));
-            } else {
-                const wrapped = new errors.UnhandledError(err);
-                res.status(wrapped.httpStatusCode)
-                .send(JSON.stringify({
-                    error: wrapped.message,
-                    content: null,
-                }));
-            }
-        });
+        .then(content => {
+            res.send({ error: null, content });
+        }).catch(errorHandlerCallback(res));
     }
 }

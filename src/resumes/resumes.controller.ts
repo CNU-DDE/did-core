@@ -9,13 +9,12 @@ import {
     Query,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { BaseError, UnhandledError } from 'src/domain/errors.domain';
 import { ResumesService } from './resumes.service';
 import { PostResumeDto } from './dto/post-resume.dto';
-import { AxiosError } from 'axios';
 import { StatusCodes as http } from 'http-status-codes';
 import { mariaId_t, mongoId_t } from 'did-core';
 import Const from 'src/config/const.config';
+import {errorHandlerCallback} from 'src/utils/callback.util';
 
 @Controller(`api/${Const.API_VERSION}/resume`)
 export class ResumesController {
@@ -37,23 +36,7 @@ export class ResumesController {
             claimsData.careers,
         ).then(() => {
             res.status(http.CREATED).send({ error: null });
-        }).catch(err => {
-            // Handled error
-            if(err instanceof BaseError) {
-                res.status(err.httpStatusCode).send({ error: err.message });
-
-            // Microservice error
-            } else if(err instanceof AxiosError) {
-                res.status(err.response.status).send(err.response.data);
-
-            // Unhandled error
-            } else {
-                throw new UnhandledError(err);
-            }
-        })
-        .catch(err => {
-            res.status(err.httpStatusCode).send({ error: err.message });
-        });
+        }).catch(errorHandlerCallback(res));
     }
 
     @Get()
@@ -65,24 +48,7 @@ export class ResumesController {
         this.resumesService.getAll(req.cookies.access_token, positionId)
         .then(claims => {
             res.status(http.OK).send({ error: null, claims, });
-        })
-        .catch(err => {
-            // Handled error
-            if(err instanceof BaseError) {
-                res.status(err.httpStatusCode).send({ error: err.message });
-
-            // Microservice error
-            } else if(err instanceof AxiosError) {
-                res.status(err.response.status).send(err.response.data);
-
-            // Unhandled error
-            } else {
-                throw new UnhandledError(err);
-            }
-        })
-        .catch(err => {
-            res.status(err.httpStatusCode).send({ error: err.message });
-        });
+        }).catch(errorHandlerCallback(res));
     }
 
     @Get('/:id')
@@ -94,23 +60,6 @@ export class ResumesController {
         this.resumesService.getOne(id, req.cookies.access_token)
         .then(detail => {
             res.status(http.OK).send({ error: null, detail, });
-        })
-        .catch(err => {
-            // Handled error
-            if(err instanceof BaseError) {
-                res.status(err.httpStatusCode).send({ error: err.message });
-
-            // Microservice error
-            } else if(err instanceof AxiosError) {
-                res.status(err.response.status).send(err.response.data);
-
-            // Unhandled error
-            } else {
-                throw new UnhandledError(err);
-            }
-        })
-        .catch(err => {
-            res.status(err.httpStatusCode).send({ error: err.message });
-        });
+        }).catch(errorHandlerCallback(res));
     }
 }

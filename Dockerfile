@@ -18,9 +18,9 @@ LABEL app_version="1.0.0"
 LABEL description="Injik/did-core API server image"
 
 WORKDIR /opt
-COPY --from=bundler /usr/src/app/dist/* ./
+COPY --from=bundler /usr/src/app/dist ./dist
 COPY --from=bundler /usr/src/app/package*.json ./
 RUN npm install --only=prod
 
 EXPOSE 7771
-ENTRYPOINT [ "node", "index.js" ]
+ENTRYPOINT [ "node", "dist/main" ]
