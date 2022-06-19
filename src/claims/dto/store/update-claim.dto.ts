@@ -1,4 +1,4 @@
-import { career_t } from "did-core";
+import { encVc_t } from "did-core";
 import { IsBase64, IsEnum, IsIn, IsString } from "class-validator";
 import { ClaimStatus } from "src/domain/enums.domain";
 
@@ -9,7 +9,7 @@ export class UpdateClaimToAcceptedDto {
 
     @IsString()
     @IsBase64()
-    career: career_t;
+    career: encVc_t;
 }
 
 export class UpdateClaimToRejectedDto {

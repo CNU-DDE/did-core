@@ -8,24 +8,16 @@ import {
 } from 'class-validator'
 import { IsDID } from 'src/utils/validation.util';
 import { Type } from 'class-transformer';
-import { career_t, did_t } from 'did-core';
+import { did_t, ipfsHash_t } from 'did-core';
 import { ClaimContentDto } from '../nested/claim-content.dto';
 
-export class CommonClaimDto {
+export class CommonDto {
     // -------------------------
     // Common requirement
     // -------------------------
-    @IsDID()
-    readonly issuer: did_t;
-
     @IsString()
     readonly title: string;
-}
 
-export class PostClaimDto extends CommonClaimDto {
-    // -------------------------
-    // VC Claim requirement
-    // -------------------------
     @IsDefined()
     @IsNotEmptyObject()
     @IsObject()
@@ -34,7 +26,16 @@ export class PostClaimDto extends CommonClaimDto {
     readonly claim: ClaimContentDto;
 }
 
-export class PostCareerDto extends CommonClaimDto {
+export class PostClaimDto extends CommonDto {
+    // -------------------------
+    // VC Claim requirement
+    // -------------------------
+
+    @IsDID()
+    readonly issuer: did_t;
+}
+
+export class PostContractDto extends CommonDto {
     // -------------------------
     // IPFS_HASH requirement
     // -------------------------
@@ -42,7 +43,7 @@ export class PostCareerDto extends CommonClaimDto {
     readonly owner: did_t;
 
     @IsHash("sha256")
-    readonly career: career_t;
+    readonly career: ipfsHash_t;
 }
 
-export type PostDto = PostClaimDto|PostCareerDto;
+export type PostDto = PostClaimDto|PostContractDto;

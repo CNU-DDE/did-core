@@ -5,7 +5,7 @@ import {
     IsHash,
     IsEnum,
 } from 'class-validator'
-import { career_t } from 'did-core';
+import { ipfsHash_t } from 'did-core';
 import { CareerType, ClaimStatus } from 'src/domain/enums.domain';
 import { BaseClaimDto, BaseClaimInterface } from './base-claim.dto';
 
@@ -28,7 +28,7 @@ export class CreateClaimDto extends BaseClaimDto implements BaseClaimInterface {
     readonly career: undefined;
 }
 
-export class CreateCareerDto extends BaseClaimDto implements BaseClaimInterface {
+export class CreateContractDto extends BaseClaimDto implements BaseClaimInterface {
     // -------------------------
     // Implemented fields
     // -------------------------
@@ -42,5 +42,5 @@ export class CreateCareerDto extends BaseClaimDto implements BaseClaimInterface 
 
     @IsString()
     @IsHash("sha256")
-    readonly career: career_t;
+    readonly career: ipfsHash_t;
 }
