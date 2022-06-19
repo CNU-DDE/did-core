@@ -1,6 +1,5 @@
 import {
     sendBroccoliGetRequest,
-    sendIPFSGetRequest,
 } from 'src/utils/http.util';
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
@@ -9,9 +8,9 @@ import { Claim } from './schemas/claim.schema';
 import { PermissionDeniedError, NotFoundError } from 'src/domain/errors.domain';
 import { UserType, ClaimStatus, CareerType } from 'src/domain/enums.domain';
 import { encrypt } from 'eciesjs';
-import { CreateCareerDto, CreateClaimDto } from './dto/store/create-claim.dto';
+import { CreateClaimDto, CreateContractDto} from './dto/store/create-claim.dto';
 import { UpdateClaimToAcceptedDto, UpdateClaimToRejectedDto } from './dto/store/update-claim.dto';
-import { PostCareerDto, PostClaimDto, PostDto } from './dto/http/post-claim.dto';
+import { PostDto, PostClaimDto, PostContractDto } from './dto/http/post-claim.dto';
 import { KeystoreDto } from 'src/ssi/dto/keystore.dto';
 import * as dts from 'did-core';
 import { ClaimMinimumInterface, ClaimDetailInterface } from './dto/get-claim.iface';
@@ -33,7 +32,8 @@ export class ClaimsService {
         accessToken:    dts.accessToken_t,
         body:           PostDto
     ) {
-        if (body["claim"]) {
+        // VC claim creation
+        if (body["issuer"]) {
             const {
                 issuer,
                 title,
@@ -64,13 +64,23 @@ export class ClaimsService {
                 content:    claim,
                 careerType: CareerType.ENC_VC,
             } as CreateClaimDto);
-        } else if (body["career"]) {
+
+        // Smart contract creation
+        } else if (body["owner"]) {
             const {
-                issuer,
                 owner,
                 title,
+                claim,
                 career,
-            } = body as PostCareerDto;
+            } = body as PostContractDto;
+
+            // Validate employer(issuer)
+            const issuerObj = (await sendBroccoliGetRequest("/user/self", accessToken))
+            .data.user_info;
+
+            if(issuerObj.user_type != UserType.EMPLOYER) {
+                throw new PermissionDeniedError()
+            }
 
             // Validate employee(owner)
             const ownerObj = (await sendBroccoliGetRequest("/user/" + owner, accessToken))
@@ -80,24 +90,16 @@ export class ClaimsService {
                 throw new PermissionDeniedError()
             }
 
-            // Validate employer(issuer)
-            const issuerObj = (await sendBroccoliGetRequest("/user/" + issuer, accessToken))
-            .data.user_info;
-
-            if(issuerObj.user_type != UserType.EMPLOYER) {
-                throw new PermissionDeniedError()
-            }
-
             // Create claim
             this.claimModel.create({
                 owner:      ownerObj.did,
                 issuer:     issuerObj.did,
-                title:      title,
+                title,
+                content:    claim,
+                status:     ClaimStatus.INCONCLUSIVE,
                 careerType: CareerType.IPFS_HASH,
-                status:     ClaimStatus.ACCEPTED,
-                content:    (await sendIPFSGetRequest(career)).data.content,
                 career,
-            } as CreateCareerDto);
+            } as CreateContractDto);
         }
     }
 

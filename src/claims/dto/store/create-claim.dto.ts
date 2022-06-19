@@ -33,8 +33,8 @@ export class CreateContractDto extends BaseClaimDto implements BaseClaimInterfac
     // Implemented fields
     // -------------------------
     @IsEnum(ClaimStatus)
-    @IsIn([ClaimStatus.ACCEPTED])
-    readonly status: ClaimStatus.ACCEPTED;
+    @IsIn([ClaimStatus.INCONCLUSIVE])
+    readonly status: ClaimStatus.INCONCLUSIVE;
 
     @IsEnum(CareerType)
     @IsIn([CareerType.IPFS_HASH])

@@ -2,6 +2,7 @@ export enum ClaimStatus {
     PENDING = 0,        // CLAIM_STATUS_PENDING(0)
     ACCEPTED,           // CLAIM_STATUS_ACCEPTED(1)
     REJECTED,           // CLAIM_STATUS_REJECTED(2)
+    INCONCLUSIVE,       // CLAIM_STATUS_INCONCLUSIVE(3)
 }
 
 export enum CareerType {

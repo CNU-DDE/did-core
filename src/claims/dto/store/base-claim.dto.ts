@@ -9,7 +9,7 @@ import { IsDID } from 'src/utils/validation.util';
 import { Type } from 'class-transformer';
 import { did_t, career_t } from 'did-core';
 import { ClaimContentDto } from '../nested/claim-content.dto';
-import { ClaimStatus, CareerType } from 'src/domain/enums.domain';
+import { CareerType, ClaimStatus } from 'src/domain/enums.domain';
 
 export class BaseClaimDto {
     // -------------------------
