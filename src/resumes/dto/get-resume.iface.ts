@@ -3,8 +3,8 @@ import { ClaimContentInterface } from 'src/claims/dto/get-claim.iface';
 
 export interface ResumeMinimumInterface {
     id:         dts.mongoId_t,
-    holder?:    dts.did_t,
-    verifier?:  dts.did_t,
+    holder:     dts.did_t,
+    verifier:   dts.did_t,
     title:      string,
 }
 
@@ -19,9 +19,9 @@ export interface IPFSProof {
 }
 
 export interface ResumeCareerEntryInterface {
-    holder?:         dts.did_t;
-    issuer?:         dts.did_t;
-    content?:        ClaimContentInterface;
+    holder:         dts.did_t;
+    issuer:         dts.did_t;
+    content:        ClaimContentInterface;
     verify:         JWTProof|IPFSProof;
     isVerified:     boolean;
 }

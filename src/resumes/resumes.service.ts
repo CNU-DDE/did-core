@@ -72,7 +72,7 @@ export class ResumesService {
         .map(career => career.content);
 
         // Get SmartCareer array
-        const smartCareers = careerArr
+        const smartContracts = careerArr
         .filter(career => career.careerType == CareerType.IPFS_HASH)
         .map(career => career.content);
 
@@ -81,7 +81,7 @@ export class ResumesService {
             : "";
 
         // Get VP and SmartCareers
-        const careers = { vp, smartCareers };
+        const careers = { vp, smartContracts };
 
         // Create claim
         this.resumeModel.create({
@@ -108,50 +108,17 @@ export class ResumesService {
         const user = (await sendBroccoliGetRequest("/user/self", accessToken))
         .data.user_info;
 
-        // Position ID specified
-        if (positionId) {
-            // Only an employer can query with positionId
-            if(user.user_type != UserType.EMPLOYER) {
-                throw new PermissionDeniedError();
-            }
+        // Gen search query
+        const query = positionId !== undefined ? { verifier: user.did, positionId } // For a position
+            : user.user_type === UserType.EMPLOYER ? { verifier: user.did }         // For an employer
+            : { owner: user.did };                                                  // For an employee
 
-            // Get resumes
-            const resumes = await this.resumeModel.find({
-                positionId,
-                verifier: user.did,
-            }).exec()
-
-            // Serialize
-            return resumes.map(resume => ({
-                id:         resume._id,
-                title:      resume.title,
-                holder:     resume.owner,
-            }));
-        }
-
-        // For employer
-        if(user.user_type == UserType.EMPLOYER) {
-            // Get resumes
-            const resumes = await this.resumeModel.find({
-                verifier: user.did,
-            }).exec();
-
-            // Serialize
-            return resumes.map(resume => ({
-                id:     resume._id,
-                title:  resume.title,
-                holder: resume.owner,
-            }));
-        }
-
-        // For employee
-        const resumes = await this.resumeModel.find({
-            owner:  user.did,
-        }).exec();
-
-        return resumes.map(resume => ({
+        // Get resumes
+        return (await this.resumeModel.find(query).exec())
+        .map(resume => ({
             id:         resume._id,
             title:      resume.title,
+            holder:     resume.owner,
             verifier:   resume.verifier,
         }));
     }
@@ -179,9 +146,13 @@ export class ResumesService {
             throw new NotFoundError();
         }
 
-        // Permission check
-        if  ((user.user_type == UserType.EMPLOYER && resume.verifier != user.did) ||
-            (user.user_type == UserType.EMPLOYEE && resume.owner != user.did)) {
+        // Employer permission check
+        if (user.user_type == UserType.EMPLOYER && resume.verifier != user.did) {
+            throw new PermissionDeniedError();
+        }
+
+        // Employee permission check
+        if (user.user_type == UserType.EMPLOYEE && resume.owner != user.did) {
             throw new PermissionDeniedError();
         }
 
