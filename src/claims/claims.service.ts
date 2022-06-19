@@ -106,36 +106,29 @@ export class ClaimsService {
     /**
      * Get all claims for user
      * @param   accessToken:    accessToken_t
+     * @param   careerType:     CareerType|undefined
      */
     async getAll(
         accessToken:    dts.accessToken_t,
+        careerType:     CareerType|undefined,
     ): Promise<ClaimMinimumInterface[]> {
 
         // Get user info
         const user = (await sendBroccoliGetRequest("/user/self", accessToken))
         .data.user_info;
 
-        // For employer
-        if(user.user_type == UserType.EMPLOYER) {
-            const claims = await this.claimModel.find({
-                issuer: user.did,
-                status: 0,
-            }).exec();
-
-            return claims.map((claim) => ({
-                id:     claim._id,
-                holder: claim.owner,
-                title:  claim.title,
-            }));
-        }
-
         // For employee
-        const claims = await this.claimModel.find({
-            owner: user.did,
-        }).exec();
+        const claims = user.user_type == UserType.EMPLOYER
+            ? await this.claimModel.find({ issuer: user.did }).exec()
+            : await this.claimModel.find({ owner: user.did }).exec();
 
-        return claims.map((claim) => ({
+        return claims
+        // Always true for undefined careerType
+        .filter(claim => ((careerType == undefined) || claim.careerType == careerType))
+        // Serialize
+        .map((claim) => ({
             id:     claim._id,
+            holder: claim.owner,
             issuer: claim.issuer,
             title:  claim.title,
             status: claim.status,
@@ -158,35 +151,25 @@ export class ClaimsService {
 
         // Get claim
         const claim = await this.claimModel.findOne({ _id: claimId })
-        .exec()
-        .catch(() => null);
+        .exec().catch(() => null);
 
         if (!claim) {
             throw new NotFoundError();
         }
 
         // For employer
-        if(user.user_type == UserType.EMPLOYER) {
-
-            if (claim.issuer != user.did) {
-                throw new PermissionDeniedError();
-            }
-
-            return {
-                id:     claim._id,
-                holder: claim.owner,
-                title:  claim.title,
-                claim:  claim.content,
-            };
+        if((user.user_type == UserType.EMPLOYER) && (claim.issuer != user.did)) {
+            throw new PermissionDeniedError();
         }
 
         // For employee
-        if (claim.owner != user.did) {
+        if((user.user_type == UserType.EMPLOYEE) && (claim.owner != user.did)) {
             throw new PermissionDeniedError();
         }
 
         return {
             id:         claim._id,
+            holder:     claim.owner,
             issuer:     claim.issuer,
             title:      claim.title,
             claim:      claim.content,

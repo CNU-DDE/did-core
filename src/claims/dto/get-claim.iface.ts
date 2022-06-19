@@ -10,19 +10,19 @@ export interface ClaimContentInterface {
 
 export interface ClaimMinimumInterface {
     id:         dts.mongoId_t,
-    issuer?:    dts.did_t,
-    holder?:    dts.did_t,
+    issuer:     dts.did_t,
+    holder:     dts.did_t,
     title:      string,
-    status?:    ClaimStatus,
+    status:     ClaimStatus,
 }
 
 export interface ClaimDetailInterface {
     id:             dts.mongoId_t,
     title:          string,
     claim:          ClaimContentInterface,
-    issuer?:        dts.did_t,
-    holder?:        dts.did_t,
-    status?:        ClaimStatus,
-    careerType?:    CareerType,
-    career?:        dts.career_t,
+    issuer:        dts.did_t,
+    holder:        dts.did_t,
+    status:        ClaimStatus,
+    careerType:    CareerType,
+    career:        dts.career_t,
 }
