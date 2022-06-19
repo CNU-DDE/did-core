@@ -9,31 +9,31 @@ import {
 
 export class Careers {
     @Prop({ default: "" })
-    vp: vpJwt_t;
+    vp:             vpJwt_t;
 
     @Prop({ type: [String], default: [] })
-    smartCareers: ipfsHash_t[];
+    smartContracts: ipfsHash_t[];
 }
 
 @Schema()
 export class Resume extends Document {
     @Prop({ required: true })
-    owner: did_t;
+    owner:          did_t;
 
     @Prop({ required: true })
-    verifier: did_t;
+    verifier:       did_t;
 
     @Prop({ required: true })
-    title: string;
+    title:          string;
 
     @Prop({ required: true })
-    positionId: mariaId_t;
+    positionId:     mariaId_t;
 
     @Prop({ type: [Number], default: [] })
     coverLetterIds: mariaId_t[];
 
     @Prop({ type: Careers, default: {} })
-    careers: Careers;
+    careers:        Careers;
 }
 
 export const ResumeSchema = SchemaFactory.createForClass(Resume);

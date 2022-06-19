@@ -16,25 +16,25 @@ import { did_t, vpJwt_t, ipfsHash_t, mariaId_t } from 'did-core';
 export class CareersDto {
     @IsOptional()
     @IsJWT()
-    vp: vpJwt_t;
+    vp:             vpJwt_t;
 
     @IsOptional()
     @IsString({ each: true })
-    smartCareers: ipfsHash_t[];
+    smartContracts: ipfsHash_t[];
 }
 
 export class CreateResumeDto {
     @IsDID()
-    owner: did_t;
+    owner:          did_t;
 
     @IsDID()
-    verifier: did_t;
+    verifier:       did_t;
 
     @IsString()
-    title: string;
+    title:          string;
 
     @IsInt()
-    positionId: mariaId_t;
+    positionId:     mariaId_t;
 
     @IsOptional()
     @IsNumber({}, { each: true })
@@ -46,5 +46,5 @@ export class CreateResumeDto {
     @IsObject()
     @ValidateNested()
     @Type(() => CareersDto)
-    careers: CareersDto;
+    careers:        CareersDto;
 }
