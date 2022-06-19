@@ -9,10 +9,10 @@ import {
 
 export class Careers {
     @Prop({ default: "" })
-    vp:             vpJwt_t;
+    vp:         vpJwt_t;
 
     @Prop({ type: [String], default: [] })
-    smartContracts: ipfsHash_t[];
+    contracts:  ipfsHash_t[];
 }
 
 @Schema()

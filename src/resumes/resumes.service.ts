@@ -5,7 +5,6 @@ import {
 } from 'src/domain/errors.domain';
 import {
     sendBroccoliGetRequest,
-    sendIPFSGetRequest,
 } from 'src/utils/http.util';
 import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
@@ -72,7 +71,7 @@ export class ResumesService {
         .map(career => career.content);
 
         // Get SmartCareer array
-        const smartContracts = careerArr
+        const contracts = careerArr
         .filter(career => career.careerType == CareerType.IPFS_HASH)
         .map(career => career.content);
 
@@ -81,7 +80,7 @@ export class ResumesService {
             : "";
 
         // Get VP and SmartCareers
-        const careers = { vp, smartContracts };
+        const careers = { vp, contracts };
 
         // Create claim
         this.resumeModel.create({
@@ -162,7 +161,7 @@ export class ResumesService {
         .verifiableCredential;
 
         // Serialize VCs
-        const careers = vcs.map(vc => ({
+        const resolvedVP = vcs.map(vc => ({
             holder: vc.credentialSubject.id,
             issuer: vc.issuer.id,
             content: {
@@ -171,28 +170,8 @@ export class ResumesService {
                 where: vc.credentialSubject.where,
                 what: vc.credentialSubject.what,
             },
-            verify: vc.proof as iface.JWTProof,
             isVerified: true,
         } as iface.ResumeCareerEntryInterface));
-
-        // Serialize SmartCareers
-        for(const sc of resume.careers.smartCareers) {
-            try {
-                const career = (await sendIPFSGetRequest(sc)).data;
-                careers.push({
-                    holder:     career.holder,
-                    issuer:     career.issuer,
-                    content:    career.content,
-                    verify:     { type: "IPFS_HASH", hash: sc },
-                    isVerified: true,
-                } as iface.ResumeCareerEntryInterface);
-            } catch {
-                careers.push({
-                    verify:     { type: "IPFS_HASH", hash: sc },
-                    isVerified: false,
-                } as iface.ResumeCareerEntryInterface);
-            }
-        }
 
         // Serialize
         return {
@@ -201,8 +180,9 @@ export class ResumesService {
             verifier:       resume.verifier,
             title:          resume.title,
             positionId:     resume.positionId,
-            coverLetterId:  resume.coverLetterIds,
-            careers,
+            coverLetterIds: resume.coverLetterIds,
+            contracts:      resume.careers,
+            resolvedVP,
         };
     }
 }

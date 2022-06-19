@@ -16,11 +16,11 @@ import { did_t, vpJwt_t, ipfsHash_t, mariaId_t } from 'did-core';
 export class CareersDto {
     @IsOptional()
     @IsJWT()
-    vp:             vpJwt_t;
+    vp:         vpJwt_t;
 
     @IsOptional()
     @IsString({ each: true })
-    smartContracts: ipfsHash_t[];
+    contracts:  ipfsHash_t[];
 }
 
 export class CreateResumeDto {
