@@ -2,6 +2,11 @@ import {
     sendBroccoliGetRequest,
     sendIPFSGetRequest,
 } from 'src/utils/http.util';
+import {
+    ClaimMinimumInterface,
+    ClaimDetailInterface,
+    ClaimQueryInterface,
+} from './dto/get-claim.iface';
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -14,7 +19,6 @@ import { UpdateClaimToAcceptedDto, UpdateClaimToRejectedDto } from './dto/store/
 import { PostCareerDto, PostClaimDto, PostDto } from './dto/http/post-claim.dto';
 import { KeystoreDto } from 'src/ssi/dto/keystore.dto';
 import * as dts from 'did-core';
-import { ClaimMinimumInterface, ClaimDetailInterface } from './dto/get-claim.iface';
 import {SsiService} from 'src/ssi/ssi.service';
 
 @Injectable()
@@ -107,33 +111,35 @@ export class ClaimsService {
      */
     async getAll(
         accessToken:    dts.accessToken_t,
+        careerType:     CareerType|undefined,
     ): Promise<ClaimMinimumInterface[]> {
 
         // Get user info
         const user = (await sendBroccoliGetRequest("/user/self", accessToken))
         .data.user_info;
 
-        // For employer
-        if(user.user_type == UserType.EMPLOYER) {
-            const claims = await this.claimModel.find({
-                issuer: user.did,
-                status: 0,
-            }).exec();
+        const query = {} as ClaimQueryInterface;
 
-            return claims.map((claim) => ({
-                id:     claim._id,
-                holder: claim.owner,
-                title:  claim.title,
-            }));
+        // For employer
+        if (user.user_type == UserType.EMPLOYER) {
+            query.issuer = user.did;
         }
 
         // For employee
-        const claims = await this.claimModel.find({
-            owner: user.did,
-        }).exec();
+        if (user.user_type == UserType.EMPLOYEE) {
+            query.owner = user.did;
+        }
 
-        return claims.map((claim) => ({
+        // For careerType query
+        if (careerType !== undefined) {
+            query.careerType = careerType;
+        }
+
+        // Search claims
+        return (await this.claimModel.find(query).exec())
+        .map(claim => ({
             id:     claim._id,
+            holder: claim.owner,
             issuer: claim.issuer,
             title:  claim.title,
             status: claim.status,
@@ -156,35 +162,25 @@ export class ClaimsService {
 
         // Get claim
         const claim = await this.claimModel.findOne({ _id: claimId })
-        .exec()
-        .catch(() => null);
+        .exec().catch(() => null);
 
         if (!claim) {
             throw new NotFoundError();
         }
 
         // For employer
-        if(user.user_type == UserType.EMPLOYER) {
-
-            if (claim.issuer != user.did) {
-                throw new PermissionDeniedError();
-            }
-
-            return {
-                id:     claim._id,
-                holder: claim.owner,
-                title:  claim.title,
-                claim:  claim.content,
-            };
+        if(user.user_type == UserType.EMPLOYER || claim.issuer != user.did) {
+            throw new PermissionDeniedError();
         }
 
         // For employee
-        if (claim.owner != user.did) {
+        if(user.user_type == UserType.EMPLOYEE || claim.owner != user.did) {
             throw new PermissionDeniedError();
         }
 
         return {
             id:         claim._id,
+            holder:     claim.owner,
             issuer:     claim.issuer,
             title:      claim.title,
             claim:      claim.content,

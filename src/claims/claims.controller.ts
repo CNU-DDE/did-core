@@ -1,6 +1,7 @@
 import {
     Controller,
     Param,
+    Query,
     Post,
     Body,
     Req,
@@ -15,6 +16,7 @@ import { PatchClaimDto } from './dto/http/patch-claim.dto';
 import { StatusCodes as http } from 'http-status-codes';
 import { errorHandlerCallback } from 'src/utils/callback.util';
 import Const from 'src/config/const.config';
+import {career_t} from 'did-core';
 
 @Controller(`api/${Const.API_VERSION}/claim`)
 export class ClaimsController {
@@ -36,10 +38,11 @@ export class ClaimsController {
 
     @Get()
     async getAll(
-        @Req()  req:        Request,
-        @Res()  res:        Response,
+        @Req()          req:        Request,
+        @Res()          res:        Response,
+        @Query('type')  careerType: career_t,
     ) {
-        this.claimsService.getAll(req.cookies.access_token)
+        this.claimsService.getAll(req.cookies.access_token, careerType)
         .then(claims => {
             res.status(http.OK).send({ error: null, claims, });
         }).catch(errorHandlerCallback(res));
