@@ -30,5 +30,5 @@ export interface ClaimDetailInterface {
     holder:         dts.did_t,
     status:         ClaimStatus,
     careerType:     CareerType,
-    career:         dts.encVc_t|dts.ipfsHash_t,
+    career:         dts.career_t,
 }

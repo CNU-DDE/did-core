@@ -8,7 +8,7 @@ import {
 } from 'class-validator'
 import { IsDID } from 'src/utils/validation.util';
 import { Type } from 'class-transformer';
-import { career_t, did_t } from 'did-core';
+import { did_t, ipfsHash_t } from 'did-core';
 import { ClaimContentDto } from '../nested/claim-content.dto';
 
 export class CommonClaimDto {
@@ -42,7 +42,7 @@ export class PostCareerDto extends CommonClaimDto {
     readonly owner: did_t;
 
     @IsHash("sha256")
-    readonly career: career_t;
+    readonly career: ipfsHash_t;
 }
 
 export type PostDto = PostClaimDto|PostCareerDto;
